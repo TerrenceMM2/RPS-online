@@ -8,20 +8,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/style.css" type="text/css">
+    <link rel="icon" href="assets/images/favicon.png" type="image/gif">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <title>Coursework7: Rock, Paper, Scissors</title>
-</head>
-
-<body>
-
-
-
-
-
-
-
-
-    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
@@ -29,28 +17,45 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
+    <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase-app.js"></script> -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase-database.js"></script> -->
+    <title>Coursework 7: Rock, Paper, Scissors</title>
+</head>
+
+<body>
+
+    <h1>🌑 📃 ✂️</h1>
+
+    <form>
+        <div class="row">
+            <div class="col form-group">
+                <label for="first-name-input">First Name:</label>
+                <input type="text" class="form-control" id="first-name-input" placeholder="First Name">
+            </div>
+            <div class="col form-group">
+                <label for="last-name-input">Last Name:</label>
+                <input type="text" class="form-control" id="last-name-input" placeholder="Last Name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="username-input">User Name:</label>
+            <input type="text" class="form-control" id="username-input" placeholder="User Name">
+        </div>
+        <button type="submit" id="set-player" class="btn btn-primary">Submit</button>
+
+    </form>
+
+    <div id="player-stats">
+        <div id="username-display"></div>
+        <div id="record-display"></div>
+    </div>
+
+    <div id="opponent-stats">
+
+    </div>
+
     <script type="text/javascript" src="assets/js/app.js"></script>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase-app.js"></script>
-
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#config-web-app -->
-
-    <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
-            apiKey: "AIzaSyBLw--mS2bA2RRZXOi9nbadZavdBA1JaUA",
-            authDomain: "coursework7-rps.firebaseapp.com",
-            databaseURL: "https://coursework7-rps.firebaseio.com",
-            projectId: "coursework7-rps",
-            storageBucket: "",
-            messagingSenderId: "288062732004",
-            appId: "1:288062732004:web:832a923f7ff1acac"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-    </script>
 </body>
 
 </html>
