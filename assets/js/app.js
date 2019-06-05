@@ -43,19 +43,21 @@ $("#set-player").on("click", function (event) {
 
     event.preventDefault();
 
+    var users = database.ref().child("users");
+
     firstName = $("#first-name-input").val().trim();
     lastName = $("#last-name-input").val().trim();
     userName = $("#username-input").val().trim();
 
-    database.ref().set({
+    users.push({
         firstName: firstName,
         lastName: lastName,
-        userName: userName,
         winRecord: winRecord,
+        userName: userName,
         lossRecord: lossRecord
     });
 
-    database.ref().on("value", function (snapshot) {
+    users.on("value", function (snapshot) {
         userName = snapshot.val().userName;
         winRecord = snapshot.val().winRecord;
         lossRecord = snapshot.val().lossRecord;
