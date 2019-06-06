@@ -1,120 +1,140 @@
-// Your web app's Firebase configuration
-var config = {
-    apiKey: "AIzaSyBLw--mS2bA2RRZXOi9nbadZavdBA1JaUA",
-    authDomain: "coursework7-rps.firebaseapp.com",
-    databaseURL: "https://coursework7-rps.firebaseio.com",
-    projectId: "coursework7-rps",
-    storageBucket: "",
-    messagingSenderId: "288062732004",
-    appId: "1:288062732004:web:832a923f7ff1acac"
-};
-// Initialize Firebase
-firebase.initializeApp(config)
+$(document).ready(function () {
 
-var database = firebase.database();
+    // Your web app's Firebase configuration
+    var config = {
+        apiKey: "AIzaSyBLw--mS2bA2RRZXOi9nbadZavdBA1JaUA",
+        authDomain: "coursework7-rps.firebaseapp.com",
+        databaseURL: "https://coursework7-rps.firebaseio.com",
+        projectId: "coursework7-rps",
+        storageBucket: "",
+        messagingSenderId: "288062732004",
+        appId: "1:288062732004:web:832a923f7ff1acac"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(config)
 
-// Initial Values
-var firstName = "";
-var lastName = "";
-var userName = "";
-var winRecord = 0;
-var lossRecord = 0;
+    var database = firebase.database();
 
-// Round Initial Values
-var roundCount = 0;
-var winCount = 0;
-var lossCount = 0;
+    // Initial Values
+    var firstName = "";
+    var lastName = "";
+    var userName = "";
+    var winRecord = 0;
+    var lossRecord = 0;
 
-var existingUserName = "";
-var existingUserObj;
+    // Round Initial Values
+    var roundCount = 0;
+    var winCount = 0;
+    var lossCount = 0;
 
-var playerOne;
-var playerTwo;
+    var selectedUserName = "";
+    var selectedUserObj;
 
-database.ref().on("value", function (snapshot) {
+    var playerOne;
+    var playerTwo;
+    var searchPlayerOne = "";
+    var searchPlayerTwo = "";
 
-    if (snapshot.child("username").exists()) {
-        // Set the variables for highBidder/highPrice equal to the stored values in firebase.
-        userName = snapshot.val().userName;
-        winRecord = snapshot.val().winRecord;
-        lossRecord = snapshot.val().lossRecord;
+    $("#new-game").on("click", function (event) {
+        event.preventDefault();
 
-        // Change the HTML to reflect the stored values
-        $("#username-display").text(userName);
-        $("#record-display").text(winRecord + " - " + lossRecord);
-    }
-});
-
-$("#set-player").on("click", function (event) {
-
-    event.preventDefault();
-
-    firstName = $("#first-name-input").val().trim();
-    lastName = $("#last-name-input").val().trim();
-    userName = $("#username-input").val().trim();
-
-    // Sets the search reference location if an existing username is found
-    var userNameSearch = database.ref("/users").orderByChild("userName").equalTo(userName);
-
-    // Pulls data based on existing users and go through each child key.
-    // Sets the entire object and username
-    userNameSearch.on("value", function (snapshot) {
-        // Search and pull child data
-        // Source: https://github.com/firebase/functions-samples/issues/265
-        snapshot.forEach(function (childSnapshot) {
-            existingUserObj = childSnapshot.val();
-            existingUserName = existingUserObj.userName;
+        database.ref("/player1").set({
+            userName: "Ready Player 1"
+        });
+        database.ref("/player2").set({
+            userName: "Ready Player 2"
         });
     });
 
-    // If there is an existing user in the database based on User Name input value.
-    // Set the displayed username and record based on previously pulled object
-    if (existingUserName === userName) {
+    database.ref().on("value", function (snapshot) {
 
-        $("#username-display").text(existingUserObj.userName);
-        $("#record-display").text(existingUserObj.winRecord + " - " + existingUserObj.lossRecord);
+        if (snapshot.child("username").exists()) {
+            // Set the variables for highBidder/highPrice equal to the stored values in firebase.
+            userName = snapshot.val().userName;
+            winRecord = snapshot.val().winRecord;
+            lossRecord = snapshot.val().lossRecord;
 
-    // If not in the database, push user to the database, set the global variables, and set displays text.
-    } else {
+            // Change the HTML to reflect the stored values
+            $("#username-display").text(userName);
+            $("#record-display").text(winRecord + " - " + lossRecord);
+        }
+    });
 
-        database.ref("/users").push({
-            firstName: firstName,
-            lastName: lastName,
-            winRecord: winRecord,
-            userName: userName,
-            lossRecord: lossRecord
+    database.ref("/player1").on("value", function (snap) {
+        playerOne = snap.val();
+        $("#p1-username-display").text(playerOne.userName);
+        $("#p1-record-display").text(playerOne.winRecord + " - " + playerOne.lossRecord);
+    });
+
+    database.ref("/player2").on("value", function (snap) {
+        playerTwo = snap.val();
+        $("#p2-username-display").text(playerTwo.userName);
+        $("#p2-record-display").text(playerTwo.winRecord + " - " + playerTwo.lossRecord);
+    });
+
+    $("#set-player").on("click", function (event) {
+
+        event.preventDefault();
+
+        firstName = $("#first-name-input").val().trim();
+        lastName = $("#last-name-input").val().trim();
+        userName = $("#username-input").val().trim();
+
+        // Sets the search reference location if an existing username is found
+        var userNameSearch = database.ref("/users").orderByChild("userName").equalTo(userName);
+
+        // Pulls data based on existing users and go through each child key.
+        // Sets the entire object and username
+        userNameSearch.on("value", function (snapshot) {
+            // Search and pull child data
+            // Source: https://github.com/firebase/functions-samples/issues/265
+            snapshot.forEach(function (childSnapshot) {
+                selectedUserObj = childSnapshot.val();
+                selectedUserName = selectedUserObj.userName;
+            });
         });
 
-        userNameSearch.on("value", function (snapshot) {
-            snapshot.forEach(function (childSnapshot) {
-                existingUserObj = childSnapshot.val();
-                existingUserName = existingUserObj.userName;
+        // If not in the database, push user to the database, set the global variables, and set displays text.
+        // Set the displayed username and record based on previously pulled object
+        if (selectedUserName !== userName) {
+
+            database.ref("/users").push({
+                firstName: firstName,
+                lastName: lastName,
+                winRecord: winRecord,
+                userName: userName,
+                lossRecord: lossRecord
             });
 
-            $("#username-display").text(existingUserObj.userName);
-            $("#record-display").text(existingUserObj.winRecord + " - " + existingUserObj.lossRecord);
+            userNameSearch.on("value", function (snapshot) {
+                snapshot.forEach(function (childSnapshot) {
+                    selectedUserObj = childSnapshot.val();
+                    selectedUserName = selectedUserObj.userName;
+                });
+            });
+        };
+
+        
+        database.ref("/player1").on("value", function (snapshot) {
+            searchPlayerOne = snapshot.val().userName;
         });
 
-    };
+        database.ref("/player2").on("value", function (snapshot) {
+            searchPlayerTwo = snapshot.val().userName;
+        });
 
-    $(".form-control").val("");
+        if (searchPlayerOne === "Ready Player 1") {
+            database.ref("/player1").set(selectedUserObj);
+        } else if (searchPlayerOne === userName) {
+            console.log("Please choose another user");
+        } else if (searchPlayerTwo === "Ready Player 2") {
+            database.ref("/player2").set(selectedUserObj);
+        } else {
+            console.log("Player 1 & 2 are set.")
+        }
 
-    database.ref("/player1").on("value", function(snap) {
-        playerOne = snap.val();
-        console.log(playerOne);
+        $(".form-control").val("");
+
     });
-
-    database.ref("/player2").on("value", function(snap) {
-        playerTwo = snap.val();
-        console.log(playerTwo);
-    });
-
-    if (playerOne === null) {
-        database.ref("/player1").set(existingUserObj);
-    } else if (playerTwo === null) {
-        database.ref("/player2").set(existingUserObj);
-    } else {
-        console.log("Players 1 & 2 are set.");
-    }
 
 });
