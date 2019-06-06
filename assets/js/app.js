@@ -44,6 +44,9 @@ $(document).ready(function () {
         database.ref("/player2").set({
             userName: "Ready Player 2"
         });
+
+        $("#player-selection").show();
+        $("#new-game").hide();
     });
 
     database.ref().on("value", function (snapshot) {
@@ -62,12 +65,14 @@ $(document).ready(function () {
 
     database.ref("/player1").on("value", function (snap) {
         playerOne = snap.val();
+        searchPlayerOne = playerOne.userName;
         $("#p1-username-display").text(playerOne.userName);
         $("#p1-record-display").text(playerOne.winRecord + " - " + playerOne.lossRecord);
     });
 
     database.ref("/player2").on("value", function (snap) {
         playerTwo = snap.val();
+        searchPlayerTwo = playerTwo.userName;
         $("#p2-username-display").text(playerTwo.userName);
         $("#p2-record-display").text(playerTwo.winRecord + " - " + playerTwo.lossRecord);
     });
@@ -114,14 +119,8 @@ $(document).ready(function () {
             });
         };
 
-        
-        database.ref("/player1").on("value", function (snapshot) {
-            searchPlayerOne = snapshot.val().userName;
-        });
-
-        database.ref("/player2").on("value", function (snapshot) {
-            searchPlayerTwo = snapshot.val().userName;
-        });
+        console.log(searchPlayerOne);
+        console.log(searchPlayerTwo)
 
         if (searchPlayerOne === "Ready Player 1") {
             database.ref("/player1").set(selectedUserObj);
@@ -133,8 +132,21 @@ $(document).ready(function () {
             console.log("Player 1 & 2 are set.")
         }
 
+        $("#current-players").show();
+        $("#player-selection").hide();
+
         $(".form-control").val("");
 
     });
+
+
+if (searchPlayerOne !== "Ready Player 1" && searchPlayerTwo !== "Ready Player 2") {
+    $("#new-game").hide();
+    $("#player-selection").hide();
+    $("#current-players").show();
+} else if (searchPlayerOne !== "Ready Player 1") {
+    $("#new-game").hide();
+    $("#player-selection").show();
+};
 
 });

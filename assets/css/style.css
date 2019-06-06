@@ -3,3 +3,12 @@
     border-top-left-radius: calc(.25rem - 1px);
     border-top-right-radius: calc(.25rem - 1px);
 }
+
+.game-options > .row {
+    text-align: center;
+    font-size: 3rem;
+}
+
+#player-selection, #current-players, #p1-actions, #p2-actions {
+    display: none;
+}

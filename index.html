@@ -34,7 +34,7 @@
 
     <button type="button" id="new-game" class="btn btn-primary btn-lg btn-block">New Game</button>
 
-    <div class="row mt-3">
+    <div id="player-selection" class="row mt-3">
         <form class="container">
             <div class="row">
                 <div class="col form-group">
@@ -49,14 +49,15 @@
             <div class="form-group">
                 <label for="username-input">User Name:</label>
                 <input type="text" class="form-control" id="username-input" placeholder="User Name">
-                <small id="username-help" class="form-text text-muted">For existing users, your User Name is case-sensitive.</small>
+                <small id="username-help" class="form-text text-muted">For existing users, your User Name is
+                    case-sensitive.</small>
             </div>
             <button type="submit" id="set-player" class="btn btn-primary">Submit</button>
         </form>
 
     </div>
 
-    <div class="row mt-3">
+    <div id="current-players" class="row mt-3">
         <div class="container">
             <div class="row justify-content-around no-gutters card-deck">
                 <div class="col-4 card">
@@ -64,6 +65,13 @@
                     <div class="card-body">
                         <h5 class="card-title" id="p1-username-display"></h5>
                         <p class="card-text" id="p1-record-display"></p>
+                        <div id="p1-actions" class="game-options container">
+                            <div class="row">
+                                <span id="p1-rock" class="col-4">🌑</span>
+                                <span id="p1-paper" class="col-4">📃</span>
+                                <span id="p1-scissors" class="col-4">✂️</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-4 card">
@@ -71,6 +79,13 @@
                     <div class="card-body">
                         <h5 class="card-title" id="p2-username-display"></h5>
                         <p class="card-text" id="p2-record-display"></p>
+                        <div id="p2-actions" class="game-options container">
+                            <div class="row">
+                                <span id="p2-rock" class="col-4">🌑</span>
+                                <span id="p2-paper" class="col-4">📃</span>
+                                <span id="p2-scissors" class="col-4">✂️</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
