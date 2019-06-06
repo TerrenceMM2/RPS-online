@@ -49,18 +49,35 @@ $("#set-player").on("click", function (event) {
     lastName = $("#last-name-input").val().trim();
     userName = $("#username-input").val().trim();
 
-    users.push({
-        firstName: firstName,
-        lastName: lastName,
-        winRecord: winRecord,
-        userName: userName,
-        lossRecord: lossRecord
-    });
-
     users.on("value", function (snapshot) {
-        userName = snapshot.val().userName;
-        winRecord = snapshot.val().winRecord;
-        lossRecord = snapshot.val().lossRecord;
+
+        // Searches database for existing username.
+        // Source: https://stackoverflow.com/questions/40471284/firebase-search-by-child-value
+        if (users.orderByChild('userName').equalTo(userName)) {
+            var storedUser = 
+            userName = snapshot.val().userName;
+            winRecord = snapshot.val().winRecord;
+            lossRecord = snapshot.val().lossRecord;
+        } else {
+            users.push({
+                firstName: firstName,
+                lastName: lastName,
+                winRecord: winRecord,
+                userName: userName,
+                lossRecord: lossRecord
+            });
+        };
+
+        console.log(userName);
+        console.log(winRecord);
+        console.log(lossRecord);
+
+        $("#username-display").text(userName);
+        $("#record-display").text(winRecord + " - " + lossRecord);
+
+        // userName = snapshot.val().userName;
+        // winRecord = snapshot.val().winRecord;
+        // lossRecord = snapshot.val().lossRecord;
     });
 
     $("#username-display").text(userName);
