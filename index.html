@@ -47,6 +47,7 @@
             <div class="form-group">
                 <label for="username-input">User Name:</label>
                 <input type="text" class="form-control" id="username-input" placeholder="User Name">
+                <small id="username-help" class="form-text text-muted">For existing users, your User Name is case-sensitive.</small>
             </div>
             <button type="submit" id="set-player" class="btn btn-primary">Submit</button>
         </form>
@@ -55,27 +56,23 @@
 
     <div class="row mt-3">
         <div class="container">
-                <div class="card-deck">
-                    <div class="card">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Image cap"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
-                        <!-- <img src="..." class="card-img-top" alt="..."> -->
-                        <div class="card-body">
-                            <h5 class="card-title" id="username-display"></h5>
-                            <p class="card-text" id="record-display"></p>
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                        </div>
-                    </div>
-                    <div class="card">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Image cap"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
-                        <!-- <img src="..." class="card-img-top" alt="..."> -->
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                                content.</p>
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                        </div>
+            <div class="row justify-content-around no-gutters card-deck">
+                <div class="col-4 card">
+                    <img src="assets/images/placeholder_img.png" class="card-img-top" alt="Placeholder Image">
+                    <div class="card-body">
+                        <h5 class="card-title" id="username-display"></h5>
+                        <p class="card-text" id="record-display"></p>
                     </div>
                 </div>
+                <div class="col-4 card">
+                    <img src="assets/images/placeholder_img.png" class="card-img-top" alt="Placeholder Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                            content.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

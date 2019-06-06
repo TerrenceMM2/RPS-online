@@ -1,21 +1,5 @@
-/* Temp Placeholder Img Styling */
-
-.bd-placeholder-img {
-    font-size: 1.125rem;
-    text-anchor: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
 .card-img-top {
     width: 100%;
     border-top-left-radius: calc(.25rem - 1px);
     border-top-right-radius: calc(.25rem - 1px);
-}
-
-svg {
-    overflow: hidden;
-    vertical-align: middle;
 }
