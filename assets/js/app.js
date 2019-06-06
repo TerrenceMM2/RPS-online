@@ -43,44 +43,59 @@ $("#set-player").on("click", function (event) {
 
     event.preventDefault();
 
-    var users = database.ref().child("users");
-
     firstName = $("#first-name-input").val().trim();
     lastName = $("#last-name-input").val().trim();
     userName = $("#username-input").val().trim();
 
-    users.on("value", function (snapshot) {
 
-        // Searches database for existing username.
-        // Source: https://stackoverflow.com/questions/40471284/firebase-search-by-child-value
-        if (users.orderByChild('userName').equalTo(userName)) {
-            var storedUser = 
-            userName = snapshot.val().userName;
-            winRecord = snapshot.val().winRecord;
-            lossRecord = snapshot.val().lossRecord;
-        } else {
-            users.push({
-                firstName: firstName,
-                lastName: lastName,
-                winRecord: winRecord,
-                userName: userName,
-                lossRecord: lossRecord
-            });
-        };
+    database.ref("/users").push({
+        firstName: firstName,
+        lastName: lastName,
+        winRecord: winRecord,
+        userName: userName,
+        lossRecord: lossRecord
+    });
 
-        console.log(userName);
-        console.log(winRecord);
-        console.log(lossRecord);
 
-        $("#username-display").text(userName);
-        $("#record-display").text(winRecord + " - " + lossRecord);
+    // if (database.ref("/users").orderByChild('userName').equalTo(userName)) {
 
-        // userName = snapshot.val().userName;
-        // winRecord = snapshot.val().winRecord;
-        // lossRecord = snapshot.val().lossRecord;
+    //     console.log("This value is in the database");
+
+    //     database.ref("/users").on("value", function (snapshot) {
+
+    //     Searches database for existing username.
+    //     Source: https://stackoverflow.com/questions/40471284/firebase-search-by-child-value
+
+    //     userName = snapshot.val().userName;
+    //     winRecord = snapshot.val().winRecord;
+    //     lossRecord = snapshot.val().lossRecord;
+    // } else {
+    //     users.push({
+    //         firstName: firstName,
+    //         lastName: lastName,
+    //         winRecord: winRecord,
+    //         userName: userName,
+    //         lossRecord: lossRecord
+    //     });
+    // };
+
+    // console.log(userName);
+    // console.log(winRecord);
+    // console.log(lossRecord);
+
+    database.ref("/users").orderByChild("userName").equalTo(userName).on("value", function (snapshot) {
+
+        // Search and pull child data
+        // Source: https://github.com/firebase/functions-samples/issues/265
+        snapshot.forEach(function(childSnapshot) {
+            var childData = childSnapshot.val();
+            userName = childData.userName;
+            winRecord = childData.winRecord;
+            lossRecord = childData.lossRecord;
+
+        });
     });
 
     $("#username-display").text(userName);
     $("#record-display").text(winRecord + " - " + lossRecord);
-
 });
