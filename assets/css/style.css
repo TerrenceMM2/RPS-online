@@ -12,3 +12,9 @@
 #player-selection, #current-players, #p1-actions, #p2-actions {
     display: none;
 }
+
+#reset-game {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
