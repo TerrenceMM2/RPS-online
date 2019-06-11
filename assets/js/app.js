@@ -45,6 +45,8 @@ var resetButton = document.getElementById("reset-game");
 var warningMessage = document.getElementById("warning");
 var playerOneActions = document.getElementById("p1-actions");
 var playerTwoActions = document.getElementById("p2-actions");
+var playerOneMessage = document.getElementById("p1-info");
+var playerTwoMessage = document.getElementById("p2-info");
 
 sessionStorage.removeItem("role");
 
@@ -58,7 +60,8 @@ newGameButton.addEventListener("click", function (event) {
         userName: "Ready Player 2"
     });
     database.ref("/game").set({
-        currentGame: false
+        currentGame: false,
+        round: roundCount
     });
 
     playerSelectionSection.style.display = "block";
@@ -74,27 +77,18 @@ database.ref().once("value").then(function (snap) {
         playerOneActions.style.display = "none";
         playerTwoActions.style.display = "none";
         sessionStorage.setItem("role", "observer");
-        // // Sets currentGame value to true if two players are selected
-        // database.ref("/game").set({
-        //     currentGame: true
-        // });
-
         database.ref("/game").on("value", function (snap) {
             gameOngoing = snap.val().currentGame;
         });
-        // Else if both players are not set, the currentGame is false (i.e. not started)
     } else {
-        // database.ref("/game").set({
-        //     currentGame: false
-        // });
-
         database.ref("/game").on("value", function (snap) {
             gameOngoing = snap.val().currentGame;
         });
     }
 
+    // Displays appropriate section on load
     if (searchPlayerOne === "Ready Player 1") {
-        newGameButton.style.display = "none";
+        newGameButton.style.display = "block";
     } else if (searchPlayerTwo === "Ready Player 2") {
         playerSelectionSection.style.display = "block";
         newGameButton.style.display = "none";
@@ -108,6 +102,15 @@ database.ref().once("value").then(function (snap) {
 
 database.ref().on("value", function (snapshot) {
 
+    roundCount = snapshot.val().game.round;
+    // var p1RoundWins = snapshot.val().player1.action;
+    // var p1RoundLosses = 0;
+    // var p2RoundWins = 0;
+    // var p2RoundLosses
+    
+    var p1Choice = snapshot.val().player1.action;
+    var p2Choice = snapshot.val().player2.action;
+
     if (snapshot.child("username").exists()) {
         // Set the variables for highBidder/highPrice equal to the stored values in firebase.
         userName = snapshot.val().userName;
@@ -116,7 +119,20 @@ database.ref().on("value", function (snapshot) {
 
         document.getElementById("username-display").innerHTML = username;
         document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
-    }
+    };
+
+    if ((p1Choice === "rock" && p2Choice === "scissors") ||
+        (p1Choice === "scissors" && p2Choice === "paper") ||
+        (p1Choice === "paper" && p2Choice === "rock")) {
+        console.log("player 1 wins");
+    } else if (p1Choice === undefined || p2Choice === undefined) {
+        console.log("ready");
+    } else if (p1Choice === p2Choice) {
+        console.log("tie");
+    } else {
+        console.log("player 2 wins");
+    };
+
 });
 
 database.ref("/player1").on("value", function (snap) {
@@ -125,9 +141,6 @@ database.ref("/player1").on("value", function (snap) {
     playerOneAction = playerOne.action;
     document.getElementById("p1-username-display").innerHTML = playerOne.userName;
     document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;
-    // if (searchPlayerOne !== "Ready Player 1") {
-    //     newGameButton.style.display = "none";
-    // };
 });
 
 database.ref("/player2").on("value", function (snap) {
@@ -136,11 +149,6 @@ database.ref("/player2").on("value", function (snap) {
     playerTwoAction = playerTwo.action;
     document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
     document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
-    // if (searchPlayerTwo !== "Ready Player 2") {
-    //     newGameButton.style.display = "none";
-    //     playerSelectionSection.style.display = "none";
-    //     currentPlayerSection.style.display = "block";
-    // };
 });
 
 document.getElementById("set-player").addEventListener("click", function (event) {
@@ -211,61 +219,20 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
 });
 
-document.getElementById("p1-rock").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
+function setPlayerOneStats(element) {
+    var choice = element.getAttribute("data-value");
     database.ref("/player1").update({
         action: choice
     });
-});
+};
 
-document.getElementById("p1-paper").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
-    database.ref("/player1").update({
-        action: choice
-    });
-});
-
-document.getElementById("p1-scissors").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
-    database.ref("/player1").update({
-        action: choice
-    });
-});
-
-document.getElementById("p2-rock").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
-    database.ref("/player2").set({
-        action: choice
-    });
-});
-
-document.getElementById("p2-paper").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
+function setPlayerTwoStats(element) {
+    var choice = element.getAttribute("data-value");
     database.ref("/player2").update({
         action: choice
     });
-});
+};
 
-document.getElementById("p2-scissors").addEventListener("click", function() {
-    var choice = this.getAttribute("data-value");
-    database.ref("/player2").update({
-        action: choice
-    });
-});
-
-
-// if ((userGuess === "r") || (userGuess === "p") || (userGuess === "s")) {
-
-//     if ((userGuess === "r" && computerGuess === "s") ||
-//       (userGuess === "s" && computerGuess === "p") || 
-//       (userGuess === "p" && computerGuess === "r")) {
-//       wins++;
-//     } else if (userGuess === computerGuess) {
-//       ties++;
-//     } else {
-//       losses++;
-//     }
-// };
 
 
 
@@ -282,7 +249,8 @@ document.getElementById("reset-game").addEventListener("click", function (event)
         userName: "Ready Player 2"
     });
     database.ref("/game").set({
-        currentGame: false
+        currentGame: false,
+        round: roundCount
     });
 
     playerSelectionSection.style.display = "none";

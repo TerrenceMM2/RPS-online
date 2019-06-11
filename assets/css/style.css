@@ -9,8 +9,14 @@
     font-size: 3rem;
 }
 
-#player-selection, #current-players, #p1-actions, #p2-actions, #warning {
+#player-selection, #current-players, #p1-actions, #p2-actions, #warning, .alert-info {
     display: none;
+}
+
+.alert-info {
+    bottom: 0;
+    position: relative;
+    margin: 1rem 0;
 }
 
 #warning {
