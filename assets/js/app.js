@@ -33,6 +33,7 @@ var playerTwo;
 var searchPlayerOne = "";
 var searchPlayerTwo = "";
 
+sessionStorage.removeItem("role");
 
 document.getElementById("new-game").addEventListener("click", function (event) {
     event.preventDefault();
@@ -46,6 +47,19 @@ document.getElementById("new-game").addEventListener("click", function (event) {
 
     document.getElementById("player-selection").style.display = "block";
     document.getElementById("new-game").style.display = "none";
+});
+
+// On application load, check database if player1 and player2 are set.
+// If so, set current session role to "observer"
+database.ref().once("value").then(function(snap) {
+    var storedPlayerOne = snap.val().player1.userName;
+    var storedPlayerTwo = snap.val().player2.userName;
+    if (storedPlayerOne !== "Ready Player 1" && storedPlayerTwo !== "Ready Player 2") {
+        document.getElementById("p1-actions").style.display = "none";
+        document.getElementById("p2-actions").style.display = "none";
+        sessionStorage.setItem("role", "observer");
+        console.log(sessionStorage.role);
+    }
 });
 
 database.ref().on("value", function (snapshot) {
@@ -128,14 +142,16 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
     if (searchPlayerOne === "Ready Player 1") {
         database.ref("/player1").set(selectedUserObj);
+        sessionStorage.setItem("role", "player1");
+        console.log(sessionStorage.role)
     } else if (searchPlayerOne === userName) {
         console.log("Please choose another user");
     } else if (searchPlayerTwo === "Ready Player 2") {
         database.ref("/player2").set(selectedUserObj);
-    } else {
-        console.log("Player 1 & 2 are set.");
-    }
-    
+        sessionStorage.setItem("role", "player2");
+        console.log(sessionStorage.role);
+    };
+
 
     document.getElementById("current-players").style.display = "block";
     document.getElementById("player-selection").style.display = "none";
@@ -144,14 +160,19 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
 });
 
-if (searchPlayerOne !== "Ready Player 1" && searchPlayerTwo !== "Ready Player 2") {
 
-    document.getElementById("p1-actions").style.display = "block";
-    document.getElementById("p2-actions").style.display = "block";
-}
+// if ((userGuess === "r") || (userGuess === "p") || (userGuess === "s")) {
 
-
-
+//     if ((userGuess === "r" && computerGuess === "s") ||
+//       (userGuess === "s" && computerGuess === "p") || 
+//       (userGuess === "p" && computerGuess === "r")) {
+//       wins++;
+//     } else if (userGuess === computerGuess) {
+//       ties++;
+//     } else {
+//       losses++;
+//     }
+// };
 
 
 
