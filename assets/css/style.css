@@ -9,8 +9,14 @@
     font-size: 3rem;
 }
 
-#player-selection, #current-players, #p1-actions, #p2-actions {
+#player-selection, #current-players, #p1-actions, #p2-actions, #warning {
     display: none;
+}
+
+#warning {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
 }
 
 #reset-game {
