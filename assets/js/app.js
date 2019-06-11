@@ -48,19 +48,18 @@ document.getElementById("new-game").addEventListener("click", function (event) {
     document.getElementById("new-game").style.display = "none";
 });
 
+database.ref().on("value", function (snapshot) {
 
-// database.ref().on("value", function (snapshot) {
+    if (snapshot.child("username").exists()) {
+        // Set the variables for highBidder/highPrice equal to the stored values in firebase.
+        userName = snapshot.val().userName;
+        winRecord = snapshot.val().winRecord;
+        lossRecord = snapshot.val().lossRecord;
 
-//     if (snapshot.child("username").exists()) {
-//         // Set the variables for highBidder/highPrice equal to the stored values in firebase.
-//         userName = snapshot.val().userName;
-//         winRecord = snapshot.val().winRecord;
-//         lossRecord = snapshot.val().lossRecord;
-
-//         document.getElementById("username-display").innerHTML = username;
-//         document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
-//     }
-// });
+        document.getElementById("username-display").innerHTML = username;
+        document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
+    }
+});
 
 database.ref("/player1").on("value", function (snap) {
     playerOne = snap.val();
@@ -68,7 +67,6 @@ database.ref("/player1").on("value", function (snap) {
     document.getElementById("p1-username-display").innerHTML = playerOne.userName;
     document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;
     if (searchPlayerOne !== "Ready Player 1") {
-        console.log(1);
         document.getElementById("new-game").style.display = "none";
         document.getElementById("player-selection").style.display = "block";
     };
@@ -79,6 +77,11 @@ database.ref("/player2").on("value", function (snap) {
     searchPlayerTwo = playerTwo.userName;
     document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
     document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
+    if (searchPlayerTwo !== "Ready Player 2") {
+        document.getElementById("new-game").style.display = "none";
+        document.getElementById("player-selection").style.display = "none";
+        document.getElementById("current-players").style.display = "block";
+    };
 });
 
 document.getElementById("set-player").addEventListener("click", function (event) {
@@ -130,7 +133,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
     } else if (searchPlayerTwo === "Ready Player 2") {
         database.ref("/player2").set(selectedUserObj);
     } else {
-        console.log("Player 1 & 2 are set.")
+        console.log("Player 1 & 2 are set.");
     }
     
 
@@ -141,20 +144,11 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
 });
 
-// if (searchPlayerOne !== "Ready Player 1") {
-//     console.log(1);
-//     document.getElementById("new-game").style.display = "none";
-//     document.getElementById("player-selection").style.display = "block";
-// } else if (searchPlayerOne === userName) {
-//     console.log(3);
-//     console.log("Please choose another user");
-// } else if (searchPlayerTwo === "Ready Player 2") {
-//     console.log(4);
-//     database.ref("/player2").set(selectedUserObj);
-// } else {
-//     console.log(5);
-//     console.log("Player 1 & 2 are set.")
-// }
+if (searchPlayerOne !== "Ready Player 1" && searchPlayerTwo !== "Ready Player 2") {
+
+    document.getElementById("p1-actions").style.display = "block";
+    document.getElementById("p2-actions").style.display = "block";
+}
 
 
 
