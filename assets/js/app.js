@@ -130,16 +130,23 @@ database.ref().on("value", function (snapshot) {
                 roundWins: roundWins,
                 action: ""
             });
+            database.ref("/game").update({
+                round: roundCount
+            });
         } else if (playerOneChoice === playerTwoChoice) {
             warningMessage.innerHTML = "It's a tie!";
             warningMessage.classList.add("alert-info");
             warningMessage.style.display = "block";
         } else {
+            console.log("player 2 wins");
             roundCount++;
-            roundWins++;
+            roundLosses++;
             database.ref("/player1").update({
-                roundWins: roundWins,
+                roundLosses: roundLosses,
                 action: ""
+            });
+            database.ref("/game").update({
+                round: roundCount
             });
         };
     };
