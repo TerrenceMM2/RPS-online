@@ -19,6 +19,8 @@ var lastName = "";
 var userName = "";
 var winRecord = 0;
 var lossRecord = 0;
+var roundWins = 0;
+var roundLosses = 0;
 var playerAction = "";
 
 // Round Initial Values
@@ -34,8 +36,8 @@ var playerOne;
 var playerTwo;
 var searchPlayerOne = "";
 var searchPlayerTwo = "";
-var playerOneAction;
-var playerTwoAction;
+var playerOneChoice;
+var playerTwoChoice;
 
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
@@ -103,13 +105,9 @@ database.ref().once("value").then(function (snap) {
 database.ref().on("value", function (snapshot) {
 
     roundCount = snapshot.val().game.round;
-    // var p1RoundWins = snapshot.val().player1.action;
-    // var p1RoundLosses = 0;
-    // var p2RoundWins = 0;
-    // var p2RoundLosses
-    
-    var p1Choice = snapshot.val().player1.action;
-    var p2Choice = snapshot.val().player2.action;
+
+    playerOneChoice = snapshot.val().player1.action;
+    playerTwoChoice = snapshot.val().player2.action;
 
     if (snapshot.child("username").exists()) {
         // Set the variables for highBidder/highPrice equal to the stored values in firebase.
@@ -121,16 +119,29 @@ database.ref().on("value", function (snapshot) {
         document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
     };
 
-    if ((p1Choice === "rock" && p2Choice === "scissors") ||
-        (p1Choice === "scissors" && p2Choice === "paper") ||
-        (p1Choice === "paper" && p2Choice === "rock")) {
-        console.log("player 1 wins");
-    } else if (p1Choice === undefined || p2Choice === undefined) {
-        console.log("ready");
-    } else if (p1Choice === p2Choice) {
-        console.log("tie");
-    } else {
-        console.log("player 2 wins");
+    if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
+        if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
+            (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
+            (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
+            console.log("player 1 wins");
+            roundWins++;
+            roundCount++;
+            database.ref("/player1").update({
+                roundWins: roundWins,
+                action: ""
+            });
+        } else if (playerOneChoice === playerTwoChoice) {
+            warningMessage.innerHTML = "It's a tie!";
+            warningMessage.classList.add("alert-info");
+            warningMessage.style.display = "block";
+        } else {
+            roundCount++;
+            roundWins++;
+            database.ref("/player1").update({
+                roundWins: roundWins,
+                action: ""
+            });
+        };
     };
 
 });
@@ -183,7 +194,9 @@ document.getElementById("set-player").addEventListener("click", function (event)
             winRecord: winRecord,
             userName: userName,
             lossRecord: lossRecord,
-            action: playerAction
+            action: playerAction,
+            roundWins: roundWins,
+            roundLosses: roundLosses
         });
 
         userNameSearch.on("value", function (snapshot) {
@@ -202,6 +215,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         playerSelectionSection.style.display = "none"
     } else if (searchPlayerOne === userName) {
         warningMessage.innerHTML = "This user has already been set."
+        warningMessage.classList.add("alert-warning");
         warningMessage.style.display = "block";
     } else if (searchPlayerTwo === "Ready Player 2") {
         database.ref("/player2").set(selectedUserObj);
@@ -210,7 +224,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         warningMessage.style.display = "none";
         currentPlayerSection.style.display = "block";
         playerSelectionSection.style.display = "none";
-        database.ref("/game").set({
+        database.ref("/game").update({
             currentGame: true
         });
     };
@@ -219,8 +233,17 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
 });
 
+
+
 function setPlayerOneStats(element) {
     var choice = element.getAttribute("data-value");
+    var selectedElement = element;
+    var otherElements = document.getElementsByClassName("p1-action")
+    for (var i = 0; i < otherElements.length; i++) {
+        if (otherElements[i] !== selectedElement) {
+            otherElements[i].style.display = "none";
+        };
+    };
     database.ref("/player1").update({
         action: choice
     });
@@ -228,6 +251,13 @@ function setPlayerOneStats(element) {
 
 function setPlayerTwoStats(element) {
     var choice = element.getAttribute("data-value");
+    var selectedElement = element;
+    var otherElements = document.getElementsByClassName("p2-action")
+    for (var i = 0; i < otherElements.length; i++) {
+        if (otherElements[i] !== selectedElement) {
+            otherElements[i].style.display = "none";
+        };
+    };
     database.ref("/player2").update({
         action: choice
     });
@@ -248,6 +278,7 @@ document.getElementById("reset-game").addEventListener("click", function (event)
     database.ref("/player2").set({
         userName: "Ready Player 2"
     });
+
     database.ref("/game").set({
         currentGame: false,
         round: roundCount
