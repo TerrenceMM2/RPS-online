@@ -14,8 +14,6 @@ firebase.initializeApp(config)
 var database = firebase.database();
 
 // Initial Values
-var firstName = "";
-var lastName = "";
 var userName = "";
 var winRecord = 0;
 var lossRecord = 0;
@@ -38,6 +36,10 @@ var searchPlayerOne = "";
 var searchPlayerTwo = "";
 var playerOneChoice;
 var playerTwoChoice;
+var playerOneWins = 0;
+var playerOneLosses = 0;
+var playerTwoWins = 0;
+var playerTwoLosses = 0;
 
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
@@ -63,7 +65,7 @@ newGameButton.addEventListener("click", function (event) {
     });
     database.ref("/game").set({
         currentGame: false,
-        round: roundCount
+        round: 0
     });
 
     playerSelectionSection.style.display = "block";
@@ -88,23 +90,9 @@ database.ref().once("value").then(function (snap) {
         });
     }
 
-    // Displays appropriate section on load
-    if (searchPlayerOne === "Ready Player 1") {
-        newGameButton.style.display = "block";
-    } else if (searchPlayerTwo === "Ready Player 2") {
-        playerSelectionSection.style.display = "block";
-        newGameButton.style.display = "none";
-    } else {
-        playerSelectionSection.style.display = "none";
-        newGameButton.style.display = "none";
-        currentPlayerSection.style.display = "block";
-    }
-
 });
 
 database.ref().on("value", function (snapshot) {
-
-    roundCount = snapshot.val().game.round;
 
     playerOneChoice = snapshot.val().player1.action;
     playerTwoChoice = snapshot.val().player2.action;
@@ -119,36 +107,59 @@ database.ref().on("value", function (snapshot) {
         document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
     };
 
+    if (searchPlayerOne === "Ready Player 1") {
+        newGameButton.style.display = "block";
+    } else if (searchPlayerTwo === "Ready Player 2") {
+        playerSelectionSection.style.display = "block";
+        newGameButton.style.display = "none";
+    } else {
+        playerSelectionSection.style.display = "none";
+        newGameButton.style.display = "none";
+        currentPlayerSection.style.display = "block";
+    }
+
     if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
         if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
             (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
             (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
-            console.log("player 1 wins");
-            roundWins++;
+            playerOneWinner();
+            playerTwoLoser();
             roundCount++;
             database.ref("/player1").update({
-                roundWins: roundWins,
+                roundWins: playerOneWins,
+                action: ""
+            });
+            database.ref("/player2").update({
+                roundLosses: playerTwoLosses,
                 action: ""
             });
             database.ref("/game").update({
                 round: roundCount
             });
+            setTimeout(nextRound, 3000);
         } else if (playerOneChoice === playerTwoChoice) {
             warningMessage.innerHTML = "It's a tie!";
-            warningMessage.classList.add("alert-info");
+            warningMessage.setAttribute("class", "alert-info");
             warningMessage.style.display = "block";
+            setTimeout(nextRound, 3000);
         } else {
-            console.log("player 2 wins");
+            playerTwoWinner();
+            playerOneLoser();
             roundCount++;
-            roundLosses++;
             database.ref("/player1").update({
-                roundLosses: roundLosses,
+                roundLosses: playerOneLosses,
+                action: ""
+            });
+            database.ref("/player2").update({
+                roundWins: playerTwoWins,
                 action: ""
             });
             database.ref("/game").update({
                 round: roundCount
             });
+            setTimeout(nextRound, 3000);
         };
+
     };
 
 });
@@ -173,8 +184,6 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
     event.preventDefault();
 
-    firstName = document.getElementById("first-name-input").value
-    lastName = document.getElementById("last-name-input").value
     userName = document.getElementById("username-input").value
 
     // Sets the search reference location if an existing username is found
@@ -196,8 +205,6 @@ document.getElementById("set-player").addEventListener("click", function (event)
     if (selectedUserName !== userName) {
 
         database.ref("/users").push({
-            firstName: firstName,
-            lastName: lastName,
             winRecord: winRecord,
             userName: userName,
             lossRecord: lossRecord,
@@ -222,7 +229,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         playerSelectionSection.style.display = "none"
     } else if (searchPlayerOne === userName) {
         warningMessage.innerHTML = "This user has already been set."
-        warningMessage.classList.add("alert-warning");
+        warningMessage.setAttribute("class", "alert alert-warning");
         warningMessage.style.display = "block";
     } else if (searchPlayerTwo === "Ready Player 2") {
         database.ref("/player2").set(selectedUserObj);
@@ -239,6 +246,34 @@ document.getElementById("set-player").addEventListener("click", function (event)
     document.getElementsByClassName("form-control").value = " ";
 
 });
+
+function playerOneWinner() {
+    playerOneMessage.innerHTML = "Winner!";
+    playerOneMessage.setAttribute("class", "alert alert-success");
+    playerOneMessage.style.display = "block";
+    return playerOneWins++
+};
+
+function playerOneLoser() {
+    playerOneMessage.innerHTML = "Loser!";
+    playerOneMessage.setAttribute("class", "alert alert-danger");
+    playerOneMessage.style.display = "block";
+    return playerOneLosses++
+};
+
+function playerTwoWinner() {
+    playerTwoMessage.innerHTML = "Winner!";
+    playerTwoMessage.setAttribute("class", "alert alert-success");
+    playerTwoMessage.style.display = "block";
+    return playerTwoWins++
+};
+
+function playerTwoLoser() {
+    playerTwoMessage.innerHTML = "Loser!";
+    playerTwoMessage.setAttribute("class", "alert alert-danger");
+    playerTwoMessage.style.display = "block";
+    return playerTwoLosses++
+};
 
 
 
@@ -270,6 +305,28 @@ function setPlayerTwoStats(element) {
     });
 };
 
+function nextRound() {
+    var playerOneChoices = document.getElementsByClassName("p1-action");
+    for (var i = 0; i < playerOneChoices.length; i++) {
+        playerOneChoices[i].style.display = "block";
+    };
+    var playerTwoChoices = document.getElementsByClassName("p2-action");
+    for (var i = 0; i < playerTwoChoices.length; i++) {
+        playerTwoChoices[i].style.display = "block";
+    };
+    database.ref("/player1").update({
+        action: ""
+    });
+    database.ref("/player2").update({
+        action: ""
+    });
+    warningMessage.style.display = "none";
+    playerOneMessage.style.display = "none";
+    playerTwoMessage.style.display = "none";
+
+    clearTimeout();
+};
+
 
 
 
@@ -288,11 +345,13 @@ document.getElementById("reset-game").addEventListener("click", function (event)
 
     database.ref("/game").set({
         currentGame: false,
-        round: roundCount
+        round: 0
     });
 
     playerSelectionSection.style.display = "none";
     currentPlayerSection.style.display = "none";
     newGameButton.style.display = "block";
     warningMessage.style.display = "none";
+    playerOneMessage.classList.remove();
+    playerTwoMessage.classList.remove();
 });

@@ -9,14 +9,14 @@ Live Link: Coming Soon ...
     2. Store name in DB ✔️  
     2. Set Player 1 in DB ✔️  
     2. Show name on page ✔️  
-3. Show Player 2 data (relative)  
-4. Show rock, paper, scissors option  
+3. Show Player 2 data (relative) ✔️  
+4. Show rock, paper, scissors option  ✔️
 5. Start time (5 seconds)  
-6. Users clicks options  
-    6. Store in DB  
-    6. Show P1 choice  
-    6. Show P2 choice  
-7. if/else statement  
+6. Users clicks options  ✔️
+    6. Store in DB  ✔️
+    6. Show P1 choice  ✔️
+    6. Show P2 choice  ✔️
+7. if/else statement  ✔️
     7. Win  
         7. Set Winner in DB  
         7. winCount++ in DB  
