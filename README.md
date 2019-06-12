@@ -12,17 +12,17 @@ Live Link: Coming Soon ...
 3. Show Player 2 data (relative) ✔️  
 4. Show rock, paper, scissors option  ✔️
 5. Start time (5 seconds)  
-6. Users clicks options  ✔️
-    6. Store in DB  ✔️
-    6. Show P1 choice  ✔️
-    6. Show P2 choice  ✔️
-7. if/else statement  ✔️
-    7. Win  
-        7. Set Winner in DB  
-        7. winCount++ in DB  
-    7. Loss  
-        7. if not Winner  
-        7. lossCount++ in DB  
-    7. roundCount++  
-    7. Show Winner from DB  
+6. Users clicks options ✔️  
+    * Store in DB ✔️  
+    * Show P1 choice ✔️  
+    * Show P2 choice ✔️  
+7. if/else statement ✔️️  
+    * Win  
+        * Set Winner in DB  
+        * winCount++ in DB  
+    * Loss  
+        * if not Winner  
+        * lossCount++ in DB  
+    * roundCount++  
+    * Show Winner from DB  
 8. After 5 rounds, calculate winner  

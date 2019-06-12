@@ -30,6 +30,10 @@ small {
     color: #f8f9fa;
 }
 
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.377);
+}
+
 .card-img-top {
     width: 100%;
     border-top-left-radius: calc(.25rem - 1px);

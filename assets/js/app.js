@@ -44,7 +44,6 @@ var playerTwoLosses = 0;
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
 var currentPlayerSection = document.getElementById("current-players");
-// var newGameButton = document.getElementById("new-game");
 var resetButton = document.getElementById("reset-game");
 var messagePlaceholder = document.getElementById("warning");
 var playerOneActions = document.getElementById("p1-actions");
@@ -56,12 +55,34 @@ sessionStorage.removeItem("role");
 
 database.ref().on("value", function (snapshot) {
 
+    // Player one DB values
+    playerOne = snapshot.val().player1;
+    searchPlayerOne = playerOne.userName;
+    playerOneAction = playerOne.action;
+
+    if (searchPlayerOne !== "") {
+        document.getElementById("p1-username-display").innerHTML = playerOne.userName;
+        document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;    
+    };
+    
+    // Player two DB values
+    playerTwo = snapshot.val().player2;
+    searchPlayerTwo = playerTwo.userName;
+    playerTwoAction = playerTwo.action;
+
+    if (searchPlayerTwo !== "") {
+        document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
+        document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
+    } else {
+        document.getElementById("p2-username-display").innerHTML = "Waiting for opponent ...";
+        document.getElementById("p2-record-display").style.display = "none";
+    }
+
     playerOneChoice = snapshot.val().player1.action;
     playerTwoChoice = snapshot.val().player2.action;
     gameOngoing = snapshot.val().game.currentGame;
 
     if (snapshot.child("username").exists()) {
-        // Set the variables for highBidder/highPrice equal to the stored values in firebase.
         userName = snapshot.val().userName;
         winRecord = snapshot.val().winRecord;
         lossRecord = snapshot.val().lossRecord;
@@ -131,22 +152,6 @@ database.ref().on("value", function (snapshot) {
 
 });
 
-database.ref("/player1").on("value", function (snap) {
-    playerOne = snap.val();
-    searchPlayerOne = playerOne.userName;
-    playerOneAction = playerOne.action;
-    document.getElementById("p1-username-display").innerHTML = playerOne.userName;
-    document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;
-});
-
-database.ref("/player2").on("value", function (snap) {
-    playerTwo = snap.val();
-    searchPlayerTwo = playerTwo.userName;
-    playerTwoAction = playerTwo.action;
-    document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
-    document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
-});
-
 document.getElementById("set-player").addEventListener("click", function (event) {
 
     event.preventDefault();
@@ -188,7 +193,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         });
     };
 
-    if (searchPlayerOne === "Ready Player 1") {
+    if (searchPlayerOne === "") {
         database.ref("/player1").set(selectedUserObj);
         sessionStorage.setItem("role", "player1");
         playerOneActions.style.display = "block";
@@ -196,7 +201,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         playerSelectionSection.style.display = "none"
     } else if (searchPlayerOne === userName) {
         warningMessage("This user has already been set.", "alert alert-warning")
-    } else if (searchPlayerTwo === "Ready Player 2") {
+    } else if (searchPlayerTwo !== searchPlayerOne) {
         database.ref("/player2").set(selectedUserObj);
         sessionStorage.setItem("role", "player2");
         playerTwoActions.style.display = "block";
@@ -289,10 +294,10 @@ function nextRound() {
 
 function resetGame() {
     database.ref("/player1").set({
-        userName: "Ready Player 1"
+        userName: ""
     });
     database.ref("/player2").set({
-        userName: "Ready Player 2"
+        userName: ""
     });
 
     database.ref("/game").set({
@@ -318,10 +323,10 @@ document.getElementById("reset-game").addEventListener("click", function (event)
     event.preventDefault();
 
     database.ref("/player1").set({
-        userName: "Ready Player 1"
+        userName: ""
     });
     database.ref("/player2").set({
-        userName: "Ready Player 2"
+        userName: ""
     });
 
     database.ref("/game").set({
