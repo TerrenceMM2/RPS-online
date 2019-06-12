@@ -1,15 +1,52 @@
+body {
+    margin: auto 0;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ff0000+0,000000+25,000000+50,000000+75,008fd0+100,7db9e8+100 */
+    background: #ff0000;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #ff0000 0%, #000000 25%, #000000 50%, #000000 75%, #008fd0 100%, #7db9e8 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #ff0000 0%, #000000 25%, #000000 50%, #000000 75%, #008fd0 100%, #7db9e8 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #ff0000 0%, #000000 25%, #000000 50%, #000000 75%, #008fd0 100%, #7db9e8 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#7db9e8', GradientType=1);
+    /* IE6-9 */
+
+}
+
+.jumbotron {
+    border-radius: 5px;
+    background: transparent;
+    color: #f8f9fa;
+}
+
+label,
+small {
+    color: #f8f9fa;
+}
+
+.form-control {
+    background: transparent;
+    color: #f8f9fa;
+}
+
 .card-img-top {
     width: 100%;
     border-top-left-radius: calc(.25rem - 1px);
     border-top-right-radius: calc(.25rem - 1px);
 }
 
-.game-options > .row {
+.game-options>.row {
     text-align: center;
     font-size: 3rem;
 }
 
-#player-selection, #current-players, #p1-actions, #p2-actions, #warning, .alert-info {
+#player-selection,
+#current-players,
+#p1-actions,
+#p2-actions,
+#warning,
+.alert-info {
     display: none;
 }
 
