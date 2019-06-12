@@ -56,6 +56,7 @@
                                 <span id="p1-rock" data-value="rock" onclick="setPlayerOneStats(this)" class="p1-action col">🌑</span>
                                 <span id="p1-paper" data-value="paper" onclick="setPlayerOneStats(this)" class="p1-action col">📃</span>
                                 <span id="p1-scissors" data-value="scissors" onclick="setPlayerOneStats(this)" class="p1-action col">✂️</span>
+                                <span id="p1-choice" class="col"></span>
                             </div>
                         </div>
                         <div id="p1-info" class="" role="alert"></div>
@@ -71,6 +72,7 @@
                                 <span id="p2-rock" data-value="rock" onclick="setPlayerTwoStats(this)" class="p2-action col">🌑</span>
                                 <span id="p2-paper" data-value="paper" onclick="setPlayerTwoStats(this)" class="p2-action col">📃</span>
                                 <span id="p2-scissors" data-value="scissors" onclick="setPlayerTwoStats(this)" class="p2-action col">✂️</span>
+                                <span id="p2-choice" class="col">Test</span>
                             </div>
                         </div>
                         <div id="p2-info" class="" role="alert"></div>
@@ -81,6 +83,17 @@
     </div>
 
     <div id="warning" class="alert" role="alert"></div>
+
+    <div class="container mb-1" id="messenger">
+        <div id="sent-messages" class="mb-1"></div>
+        <form>
+            <div class="form-group">
+                <input type="text" class="form-control" id="chat-message" placeholder="Chat">
+                <small id="chat-message-help" class="form-text">Be kind. 🤗</small>
+            </div>
+            <button type="submit" id="send-message" class="btn btn-outline-light">Send</button>
+        </form>
+    </div>
 
     <button type="button" id="reset-game" class="btn btn-outline-dark btn-sm">Reset Game</button>
 

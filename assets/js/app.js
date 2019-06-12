@@ -40,6 +40,7 @@ var playerOneWins = 0;
 var playerOneLosses = 0;
 var playerTwoWins = 0;
 var playerTwoLosses = 0;
+var role;
 
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
@@ -53,104 +54,7 @@ var playerTwoMessagePlaceHolder = document.getElementById("p2-info");
 
 sessionStorage.removeItem("role");
 
-database.ref().on("value", function (snapshot) {
 
-    // Player one DB values
-    playerOne = snapshot.val().player1;
-    searchPlayerOne = playerOne.userName;
-    playerOneAction = playerOne.action;
-
-    if (searchPlayerOne !== "") {
-        document.getElementById("p1-username-display").innerHTML = playerOne.userName;
-        document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;    
-    };
-    
-    // Player two DB values
-    playerTwo = snapshot.val().player2;
-    searchPlayerTwo = playerTwo.userName;
-    playerTwoAction = playerTwo.action;
-
-    if (searchPlayerTwo !== "") {
-        document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
-        document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
-    } else {
-        document.getElementById("p2-username-display").innerHTML = "Waiting for opponent ...";
-        document.getElementById("p2-record-display").style.display = "none";
-    }
-
-    playerOneChoice = snapshot.val().player1.action;
-    playerTwoChoice = snapshot.val().player2.action;
-    gameOngoing = snapshot.val().game.currentGame;
-
-    if (snapshot.child("username").exists()) {
-        userName = snapshot.val().userName;
-        winRecord = snapshot.val().winRecord;
-        lossRecord = snapshot.val().lossRecord;
-
-        document.getElementById("username-display").innerHTML = username;
-        document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
-    };
-
-    if (gameOngoing) {
-        playerSelectionSection.style.display = "none";
-        currentPlayerSection.style.display = "block";
-    } else {
-        playerSelectionSection.style.display = "block";
-    }
-
-    if (roundCount === 3) {
-        var p1Wins = snapshot.val().player1.roundWins;
-        var p2Wins = snapshot.val().player2.roundWins;
-        if (p1Wins > p2Wins) {
-            warningMessage(searchPlayerOne, "alert alert-info")
-        } else if (p2Wins > p1Wins) {
-            warningMessage(searchPlayerTwo, "alert alert-info")
-        };
-        setTimeout(resetGame, 5000);
-    } else {
-        if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
-            if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
-                (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
-                (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
-                playerOneMessage("Winner!", "alert alert-success", playerOneWins);
-                playerTwoMessage("Loser.", "alert alert-danger", playerTwoLosses);
-                roundCount++;
-                database.ref("/player1").update({
-                    roundWins: playerOneWins,
-                    action: ""
-                });
-                database.ref("/player2").update({
-                    roundLosses: playerTwoLosses,
-                    action: ""
-                });
-                database.ref("/game").update({
-                    round: roundCount
-                });
-                // setTimeout(nextRound, 3000);
-            } else if (playerOneChoice === playerTwoChoice) {
-
-                // setTimeout(nextRound, 3000);
-            } else {
-                playerOneMessage("Loser.", "alert alert-danger", playerOneLosses);
-                playerTwoMessage("Winner!", "alert alert-success", playerTwoWins);
-                roundCount++;
-                database.ref("/player1").update({
-                    roundLosses: playerOneLosses,
-                    action: ""
-                });
-                database.ref("/player2").update({
-                    roundWins: playerTwoWins,
-                    action: ""
-                });
-                database.ref("/game").update({
-                    round: roundCount
-                });
-                // setTimeout(nextRound, 3000);
-            };
-        };
-    };
-
-});
 
 document.getElementById("set-player").addEventListener("click", function (event) {
 
@@ -195,7 +99,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
 
     if (searchPlayerOne === "") {
         database.ref("/player1").set(selectedUserObj);
-        sessionStorage.setItem("role", "player1");
+        sessionStorage.setItem("role", "Player 1");
         playerOneActions.style.display = "block";
         currentPlayerSection.style.display = "block";
         playerSelectionSection.style.display = "none"
@@ -203,7 +107,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         warningMessage("This user has already been set.", "alert alert-warning")
     } else if (searchPlayerTwo !== searchPlayerOne) {
         database.ref("/player2").set(selectedUserObj);
-        sessionStorage.setItem("role", "player2");
+        sessionStorage.setItem("role", "Player 2");
         playerTwoActions.style.display = "block";
         messagePlaceholder.style.display = "none";
         currentPlayerSection.style.display = "block";
@@ -212,12 +116,167 @@ document.getElementById("set-player").addEventListener("click", function (event)
             currentGame: true
         });
     } else {
-        sessionStorage.setItem("role", "observer");
-    }
+        sessionStorage.setItem("role", "Viewer");
+    };
 
-    document.getElementById("username-input").innerHTML = "";
+    document.getElementById("username-input").value = "";
 
 });
+
+
+
+document.getElementById("send-message").addEventListener("click", function (event) {
+    event.preventDefault();
+    var messageInput = document.getElementById("chat-message");
+    var message = messageInput.value;
+    var role;
+    if (sessionStorage.role === undefined) {
+        role = "Viewer";
+    } else {
+        role = sessionStorage.role;
+    }
+    database.ref("/messenger").push({
+        message: message,
+        messenger: role
+    });
+    document.getElementById("chat-message").value = "";
+});
+
+
+
+database.ref("/messenger").on("child_added", function (snapshot) {
+    var newMessage = document.createElement('div');
+    var messageBody = document.getElementById("sent-messages");
+    var role = snapshot.val().messenger;
+    newMessage.innerHTML = role + ": " + snapshot.val().message;
+    newMessage.classList.add("message", "animated", "fadeInUp", "faster");
+    messageBody.appendChild(newMessage);
+});
+
+
+
+database.ref().on("value", function (snapshot) {
+
+    // Player One DB values
+    playerOne = snapshot.val().player1;
+    searchPlayerOne = playerOne.userName;
+    playerOneAction = playerOne.action;
+
+    // Player Two DB values
+    playerTwo = snapshot.val().player2;
+    searchPlayerTwo = playerTwo.userName;
+    playerTwoAction = playerTwo.action;
+
+    // Current Game Variables
+    playerOneChoice = snapshot.val().player1.action;
+    playerTwoChoice = snapshot.val().player2.action;
+    gameOngoing = snapshot.val().game.currentGame;
+
+    // Sets Player One Card
+    if (searchPlayerOne !== "") {
+        document.getElementById("p1-username-display").innerHTML = playerOne.userName;
+        document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;
+    };
+
+    // Sets Player Two Card
+    if (searchPlayerTwo !== "") {
+        document.getElementById("p2-record-display").style.display = "block";
+        document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
+        document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
+    } else {
+        document.getElementById("p2-username-display").innerHTML = "Waiting for opponent ...";
+        document.getElementById("p2-record-display").style.display = "none";
+    }
+
+    // Checks DB for existing user
+    if (snapshot.child("username").exists()) {
+        userName = snapshot.val().userName;
+        winRecord = snapshot.val().winRecord;
+        lossRecord = snapshot.val().lossRecord;
+    };
+
+    // If there is a current game in progress, new user can only view.
+    if (gameOngoing) {
+        playerSelectionSection.style.display = "none";
+        currentPlayerSection.style.display = "block";
+    } else {
+        playerSelectionSection.style.display = "block";
+    }
+
+    // First, if the number of total rounds is met, players are notified and game resets in 10 seconds
+    if (roundCount === 5) {
+        var p1Wins = snapshot.val().player1.roundWins;
+        var p2Wins = snapshot.val().player2.roundWins;
+        if (p1Wins > p2Wins) {
+            warningMessage(searchPlayerOne, "alert alert-info")
+        } else if (p2Wins > p1Wins) {
+            warningMessage(searchPlayerTwo, "alert alert-info")
+        };
+        setTimeout(resetGame, 10000);
+        // Otherwise, game continues    
+    } else {
+        // First, checks to make sure that player one and two have made a selection.
+        if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
+            // Checks for player one win
+            if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
+                (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
+                (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
+                playerOneMessage("Winner!", "alert alert-success", playerOneWins);
+                playerTwoMessage("Loser.", "alert alert-danger", playerTwoLosses);
+                roundCount++;
+                database.ref("/player1").update({
+                    roundWins: playerOneWins,
+                    action: ""
+                });
+                database.ref("/player2").update({
+                    roundLosses: playerTwoLosses,
+                    action: ""
+                });
+                database.ref("/game").update({
+                    round: roundCount
+                });
+                setTimeout(nextRound, 3000);
+                // Checks for tie
+            } else if (playerOneChoice === playerTwoChoice) {
+                warningMessage("It's a tie!", "alert alert-info");
+                setTimeout(nextRound, 3000);
+                // Checks for player two win
+            } else {
+                playerOneMessage("Loser.", "alert alert-danger", playerOneLosses);
+                playerTwoMessage("Winner!", "alert alert-success", playerTwoWins);
+                roundCount++;
+                database.ref("/player1").update({
+                    roundLosses: playerOneLosses,
+                    action: ""
+                });
+                database.ref("/player2").update({
+                    roundWins: playerTwoWins,
+                    action: ""
+                });
+                database.ref("/game").update({
+                    round: roundCount
+                });
+                setTimeout(nextRound, 3000);
+            };
+        };
+    };
+
+    // Gets player role from sessionStorage
+    role = sessionStorage.getItem("role");
+    if (role === "Player 1") {
+        playerTwoActions.style.display = "none";
+        playerOneActions.style.display = "block";
+    } else if (role === "Player 2") {
+        playerOneActions.style.display = "none";
+        playerTwoActions.style.display = "block";
+    } else {
+        playerOneActions.style.display = "none";
+        playerTwoActions.style.display = "none";
+    }
+
+});
+
+
 
 function warningMessage(str, classes) {
     messagePlaceholder.innerHTML = str;
@@ -231,7 +290,7 @@ function playerOneMessage(str, classes, variable) {
     playerOneMessagePlaceHolder.setAttribute("class", classes);
     playerOneMessagePlaceHolder.classList.add("animated", "bounceIn", "faster")
     playerOneMessagePlaceHolder.style.display = "block";
-    return variable++
+    return variable++;
 }
 
 function playerTwoMessage(str, classes, variable) {
@@ -242,10 +301,14 @@ function playerTwoMessage(str, classes, variable) {
     return variable++
 }
 
+function playerOneChoice() {
+
+}
+
 function setPlayerOneStats(element) {
     var choice = element.getAttribute("data-value");
     var selectedElement = element;
-    var otherElements = document.getElementsByClassName("p1-action")
+    var otherElements = document.getElementsByClassName("p1-action");
     for (var i = 0; i < otherElements.length; i++) {
         if (otherElements[i] !== selectedElement) {
             otherElements[i].style.display = "none";
@@ -288,7 +351,8 @@ function nextRound() {
     messagePlaceholder.style.display = "none";
     playerOneMessagePlaceHolder.style.display = "none";
     playerTwoMessagePlaceHolder.style.display = "none";
-
+    playerOneChoicePlaceHolder.style.display = "none";
+    playerTwoChoicePlaceHolder.style.display = "none";
     clearTimeout();
 };
 
@@ -307,7 +371,6 @@ function resetGame() {
 
     playerSelectionSection.style.display = "block";
     currentPlayerSection.style.display = "none";
-    // newGameButton.style.display = "block";
     messagePlaceholder.style.display = "none";
     playerOneMessagePlaceHolder.classList.remove();
     playerTwoMessagePlaceHolder.classList.remove();
@@ -334,9 +397,18 @@ document.getElementById("reset-game").addEventListener("click", function (event)
         round: 0
     });
 
+    database.ref("/messenger").remove();
+
+    database.ref("/messenger").push({
+        message: "Get the conversation started. 💬",
+        messenger: "Chat Bot"
+    });
+
+    var messageContainer = document.getElementById("sent-messages");
+    messageContainer.parentNode.removeChild(messageContainer);
+
     playerSelectionSection.style.display = "block";
     currentPlayerSection.style.display = "none";
-    // newGameButton.style.display = "block";
     messagePlaceholder.style.display = "none";
     playerOneMessagePlaceHolder.classList.remove();
     playerTwoMessagePlaceHolder.classList.remove();

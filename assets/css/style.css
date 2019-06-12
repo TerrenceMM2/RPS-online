@@ -30,7 +30,7 @@ small {
     color: #f8f9fa;
 }
 
-.form-control::placeholder {
+.form-control::placeholder, #chat-instructions {
     color: rgba(255, 255, 255, 0.377);
 }
 
@@ -64,20 +64,25 @@ span {
 #p1-actions,
 #p2-actions,
 #warning,
-.alert-info {
+.alert-info,
+#p2-choice,
+#p1-choice {
     display: none;
 }
 
-#p1-actions, #p2-actions {
+#p1-actions,
+#p2-actions {
     padding: 0;
 }
 
-#p1-actions > row, #p2-actions > row {
+#p1-actions>row,
+#p2-actions>row {
     text-align: center;
     padding: 0;
 }
 
-#p1-info, #p2-info {
+#p1-info,
+#p2-info {
     margin: 0;
     margin-top: 1rem;
 }
@@ -98,4 +103,13 @@ span {
     position: fixed;
     bottom: 0;
     left: 0;
+}
+
+#messenger {
+    position: fixed;
+    bottom: 0;
+}
+
+.message {
+    color: #f8f9fa;
 }
