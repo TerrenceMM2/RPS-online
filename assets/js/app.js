@@ -243,7 +243,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         });
     };
 
-    document.getElementsByClassName("form-control").value = " ";
+    document.getElementById("username-input").innerHTML = "";
 
 });
 
