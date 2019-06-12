@@ -44,58 +44,21 @@ var playerTwoLosses = 0;
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
 var currentPlayerSection = document.getElementById("current-players");
-var newGameButton = document.getElementById("new-game");
+// var newGameButton = document.getElementById("new-game");
 var resetButton = document.getElementById("reset-game");
-var warningMessage = document.getElementById("warning");
+var messagePlaceholder = document.getElementById("warning");
 var playerOneActions = document.getElementById("p1-actions");
 var playerTwoActions = document.getElementById("p2-actions");
-var playerOneMessage = document.getElementById("p1-info");
-var playerTwoMessage = document.getElementById("p2-info");
+var playerOneMessagePlaceHolder = document.getElementById("p1-info");
+var playerTwoMessagePlaceHolder = document.getElementById("p2-info");
 
 sessionStorage.removeItem("role");
-
-newGameButton.addEventListener("click", function (event) {
-    event.preventDefault();
-
-    database.ref("/player1").set({
-        userName: "Ready Player 1"
-    });
-    database.ref("/player2").set({
-        userName: "Ready Player 2"
-    });
-    database.ref("/game").set({
-        currentGame: false,
-        round: 0
-    });
-
-    playerSelectionSection.style.display = "block";
-    newGameButton.style.display = "none";
-});
-
-// On application load, check database if player1 and player2 are set.
-// If so, set current session role to "observer"
-database.ref().once("value").then(function (snap) {
-    var storedPlayerOne = snap.val().player1.userName;
-    var storedPlayerTwo = snap.val().player2.userName;
-    if (storedPlayerOne !== "Ready Player 1" && storedPlayerTwo !== "Ready Player 2") {
-        playerOneActions.style.display = "none";
-        playerTwoActions.style.display = "none";
-        sessionStorage.setItem("role", "observer");
-        database.ref("/game").on("value", function (snap) {
-            gameOngoing = snap.val().currentGame;
-        });
-    } else {
-        database.ref("/game").on("value", function (snap) {
-            gameOngoing = snap.val().currentGame;
-        });
-    }
-
-});
 
 database.ref().on("value", function (snapshot) {
 
     playerOneChoice = snapshot.val().player1.action;
     playerTwoChoice = snapshot.val().player2.action;
+    gameOngoing = snapshot.val().game.currentGame;
 
     if (snapshot.child("username").exists()) {
         // Set the variables for highBidder/highPrice equal to the stored values in firebase.
@@ -107,59 +70,63 @@ database.ref().on("value", function (snapshot) {
         document.getElementById("record-display").innerHTML = winRecord + " - " + lossRecord;
     };
 
-    if (searchPlayerOne === "Ready Player 1") {
-        newGameButton.style.display = "block";
-    } else if (searchPlayerTwo === "Ready Player 2") {
-        playerSelectionSection.style.display = "block";
-        newGameButton.style.display = "none";
-    } else {
+    if (gameOngoing) {
         playerSelectionSection.style.display = "none";
-        newGameButton.style.display = "none";
         currentPlayerSection.style.display = "block";
+    } else {
+        playerSelectionSection.style.display = "block";
     }
 
-    if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
-        if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
-            (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
-            (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
-            playerOneWinner();
-            playerTwoLoser();
-            roundCount++;
-            database.ref("/player1").update({
-                roundWins: playerOneWins,
-                action: ""
-            });
-            database.ref("/player2").update({
-                roundLosses: playerTwoLosses,
-                action: ""
-            });
-            database.ref("/game").update({
-                round: roundCount
-            });
-            setTimeout(nextRound, 3000);
-        } else if (playerOneChoice === playerTwoChoice) {
-            warningMessage.innerHTML = "It's a tie!";
-            warningMessage.setAttribute("class", "alert-info");
-            warningMessage.style.display = "block";
-            setTimeout(nextRound, 3000);
-        } else {
-            playerTwoWinner();
-            playerOneLoser();
-            roundCount++;
-            database.ref("/player1").update({
-                roundLosses: playerOneLosses,
-                action: ""
-            });
-            database.ref("/player2").update({
-                roundWins: playerTwoWins,
-                action: ""
-            });
-            database.ref("/game").update({
-                round: roundCount
-            });
-            setTimeout(nextRound, 3000);
+    if (roundCount === 3) {
+        var p1Wins = snapshot.val().player1.roundWins;
+        var p2Wins = snapshot.val().player2.roundWins;
+        if (p1Wins > p2Wins) {
+            warningMessage(searchPlayerOne, "alert alert-info")
+        } else if (p2Wins > p1Wins) {
+            warningMessage(searchPlayerTwo, "alert alert-info")
         };
+        setTimeout(resetGame, 5000);
+    } else {
+        if (((playerOneChoice === "rock") || (playerOneChoice === "paper") || (playerOneChoice === "scissors")) && ((playerTwoChoice === "rock") || (playerTwoChoice === "paper") || (playerTwoChoice === "scissors"))) {
+            if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
+                (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
+                (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
+                playerOneMessage("Winner!", "alert alert-success", playerOneWins);
+                playerTwoMessage("Loser.", "alert alert-danger", playerTwoLosses);
+                roundCount++;
+                database.ref("/player1").update({
+                    roundWins: playerOneWins,
+                    action: ""
+                });
+                database.ref("/player2").update({
+                    roundLosses: playerTwoLosses,
+                    action: ""
+                });
+                database.ref("/game").update({
+                    round: roundCount
+                });
+                // setTimeout(nextRound, 3000);
+            } else if (playerOneChoice === playerTwoChoice) {
 
+                // setTimeout(nextRound, 3000);
+            } else {
+                playerOneMessage("Loser.", "alert alert-danger", playerOneLosses);
+                playerTwoMessage("Winner!", "alert alert-success", playerTwoWins);
+                roundCount++;
+                database.ref("/player1").update({
+                    roundLosses: playerOneLosses,
+                    action: ""
+                });
+                database.ref("/player2").update({
+                    roundWins: playerTwoWins,
+                    action: ""
+                });
+                database.ref("/game").update({
+                    round: roundCount
+                });
+                // setTimeout(nextRound, 3000);
+            };
+        };
     };
 
 });
@@ -228,54 +195,47 @@ document.getElementById("set-player").addEventListener("click", function (event)
         currentPlayerSection.style.display = "block";
         playerSelectionSection.style.display = "none"
     } else if (searchPlayerOne === userName) {
-        warningMessage.innerHTML = "This user has already been set."
-        warningMessage.setAttribute("class", "alert alert-warning");
-        warningMessage.style.display = "block";
+        warningMessage("This user has already been set.", "alert alert-warning")
     } else if (searchPlayerTwo === "Ready Player 2") {
         database.ref("/player2").set(selectedUserObj);
         sessionStorage.setItem("role", "player2");
         playerTwoActions.style.display = "block";
-        warningMessage.style.display = "none";
+        messagePlaceholder.style.display = "none";
         currentPlayerSection.style.display = "block";
         playerSelectionSection.style.display = "none";
         database.ref("/game").update({
             currentGame: true
         });
-    };
+    } else {
+        sessionStorage.setItem("role", "observer");
+    }
 
     document.getElementById("username-input").innerHTML = "";
 
 });
 
-function playerOneWinner() {
-    playerOneMessage.innerHTML = "Winner!";
-    playerOneMessage.setAttribute("class", "alert alert-success");
-    playerOneMessage.style.display = "block";
-    return playerOneWins++
+function warningMessage(str, classes) {
+    messagePlaceholder.innerHTML = str;
+    messagePlaceholder.setAttribute("class", classes);
+    messagePlaceholder.classList.add("animated", "fadeInUp", "faster")
+    messagePlaceholder.style.display = "block";
 };
 
-function playerOneLoser() {
-    playerOneMessage.innerHTML = "Loser!";
-    playerOneMessage.setAttribute("class", "alert alert-danger");
-    playerOneMessage.style.display = "block";
-    return playerOneLosses++
-};
+function playerOneMessage(str, classes, variable) {
+    playerOneMessagePlaceHolder.innerHTML = str;
+    playerOneMessagePlaceHolder.setAttribute("class", classes);
+    playerOneMessagePlaceHolder.classList.add("animated", "bounceIn", "faster")
+    playerOneMessagePlaceHolder.style.display = "block";
+    return variable++
+}
 
-function playerTwoWinner() {
-    playerTwoMessage.innerHTML = "Winner!";
-    playerTwoMessage.setAttribute("class", "alert alert-success");
-    playerTwoMessage.style.display = "block";
-    return playerTwoWins++
-};
-
-function playerTwoLoser() {
-    playerTwoMessage.innerHTML = "Loser!";
-    playerTwoMessage.setAttribute("class", "alert alert-danger");
-    playerTwoMessage.style.display = "block";
-    return playerTwoLosses++
-};
-
-
+function playerTwoMessage(str, classes, variable) {
+    playerTwoMessagePlaceHolder.innerHTML = str;
+    playerTwoMessagePlaceHolder.setAttribute("class", classes);
+    playerTwoMessagePlaceHolder.classList.add("animated", "bounceIn", "faster")
+    playerTwoMessagePlaceHolder.style.display = "block";
+    return variable++
+}
 
 function setPlayerOneStats(element) {
     var choice = element.getAttribute("data-value");
@@ -320,14 +280,35 @@ function nextRound() {
     database.ref("/player2").update({
         action: ""
     });
-    warningMessage.style.display = "none";
-    playerOneMessage.style.display = "none";
-    playerTwoMessage.style.display = "none";
+    messagePlaceholder.style.display = "none";
+    playerOneMessagePlaceHolder.style.display = "none";
+    playerTwoMessagePlaceHolder.style.display = "none";
 
     clearTimeout();
 };
 
+function resetGame() {
+    database.ref("/player1").set({
+        userName: "Ready Player 1"
+    });
+    database.ref("/player2").set({
+        userName: "Ready Player 2"
+    });
 
+    database.ref("/game").set({
+        currentGame: false,
+        round: 0
+    });
+
+    playerSelectionSection.style.display = "block";
+    currentPlayerSection.style.display = "none";
+    // newGameButton.style.display = "block";
+    messagePlaceholder.style.display = "none";
+    playerOneMessagePlaceHolder.classList.remove();
+    playerTwoMessagePlaceHolder.classList.remove();
+    messagePlaceholder.classList.remove();
+    clearTimeout();
+}
 
 
 
@@ -348,10 +329,11 @@ document.getElementById("reset-game").addEventListener("click", function (event)
         round: 0
     });
 
-    playerSelectionSection.style.display = "none";
+    playerSelectionSection.style.display = "block";
     currentPlayerSection.style.display = "none";
-    newGameButton.style.display = "block";
-    warningMessage.style.display = "none";
-    playerOneMessage.classList.remove();
-    playerTwoMessage.classList.remove();
+    // newGameButton.style.display = "block";
+    messagePlaceholder.style.display = "none";
+    playerOneMessagePlaceHolder.classList.remove();
+    playerTwoMessagePlaceHolder.classList.remove();
+    messagePlaceholder.classList.remove();
 });

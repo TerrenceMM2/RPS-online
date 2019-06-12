@@ -11,7 +11,7 @@ body {
     /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#7db9e8', GradientType=1);
     /* IE6-9 */
-
+    cursor: default;
 }
 
 .jumbotron {
@@ -36,6 +36,20 @@ small {
     border-top-right-radius: calc(.25rem - 1px);
 }
 
+.col {
+    padding: 0;
+}
+
+span {
+    font-size: 4vw;
+    cursor: pointer;
+    width: 100%;
+}
+
+.card-body {
+    text-align: center;
+}
+
 .game-options>.row {
     text-align: center;
     font-size: 3rem;
@@ -48,6 +62,20 @@ small {
 #warning,
 .alert-info {
     display: none;
+}
+
+#p1-actions, #p2-actions {
+    padding: 0;
+}
+
+#p1-actions > row, #p2-actions > row {
+    text-align: center;
+    padding: 0;
+}
+
+#p1-info, #p2-info {
+    margin: 0;
+    margin-top: 1rem;
 }
 
 .alert-info {
