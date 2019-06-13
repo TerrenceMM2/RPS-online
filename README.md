@@ -1,6 +1,6 @@
 # coursework7-rps-multiplayer
 Vanderbilt Coding Boot Camp - Coursework7 - Rock, Paper, Scissors Multiplayer Game  
-Live Link: Coming Soon ...  
+Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/   
   
 ### Pseudocode  
 1. Initialize DB values ✔️  
