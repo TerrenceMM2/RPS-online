@@ -9,7 +9,7 @@ var config = {
     appId: "1:288062732004:web:832a923f7ff1acac"
 };
 // Initialize Firebase
-firebase.initializeApp(config)
+firebase.initializeApp(config);
 
 var database = firebase.database();
 
@@ -29,6 +29,7 @@ var gameOngoing;
 
 var selectedUserName = "";
 var selectedUserObj;
+var uid = "";
 
 var playerOne;
 var playerTwo;
@@ -59,8 +60,6 @@ var playerTwoMessagePlaceHolder = document.getElementById("p2-info");
 
 sessionStorage.removeItem("role");
 
-
-
 document.getElementById("set-player").addEventListener("click", function (event) {
 
     event.preventDefault();
@@ -73,6 +72,9 @@ document.getElementById("set-player").addEventListener("click", function (event)
     // Pulls data based on existing users and go through each child key.
     // Sets the entire object and username
     userNameSearch.on("value", function (snapshot) {
+        // Store firebase key
+        // Source: https://stackoverflow.com/questions/43615466/how-to-get-the-key-from-a-firebase-data-snapshot
+        uid = Object.keys(snapshot.val())[0];
         // Search and pull child data
         // Source: https://github.com/firebase/functions-samples/issues/265
         snapshot.forEach(function (childSnapshot) {
@@ -95,6 +97,7 @@ document.getElementById("set-player").addEventListener("click", function (event)
         });
 
         userNameSearch.on("value", function (snapshot) {
+            uid = Object.keys(snapshot.val())[0];
             snapshot.forEach(function (childSnapshot) {
                 selectedUserObj = childSnapshot.val();
                 selectedUserName = selectedUserObj.userName;
@@ -105,18 +108,18 @@ document.getElementById("set-player").addEventListener("click", function (event)
     if (searchPlayerOne === "") {
         database.ref("/player1").set(selectedUserObj);
         sessionStorage.setItem("role", "Player 1");
-        playerOneActions.style.display = "block";
-        currentPlayerSection.style.display = "block";
-        playerSelectionSection.style.display = "none"
+        sectionDisplay(playerOneActions, "block");
+        sectionDisplay(currentPlayerSection, "block");
+        sectionDisplay(playerSelectionSection, "none");
     } else if (searchPlayerOne === userName) {
         warningMessage("This user has already been set.", "alert alert-warning")
     } else if (searchPlayerTwo !== searchPlayerOne) {
         database.ref("/player2").set(selectedUserObj);
         sessionStorage.setItem("role", "Player 2");
-        playerTwoActions.style.display = "block";
-        messagePlaceholder.style.display = "none";
-        currentPlayerSection.style.display = "block";
-        playerSelectionSection.style.display = "none";
+        sectionDisplay(playerTwoActions, "block");
+        sectionDisplay(currentPlayerSection, "block");
+        sectionDisplay(playerSelectionSection, "none");
+        sectionDisplay(messagePlaceholder, "none");
         database.ref("/game").update({
             currentGame: true
         });
@@ -127,8 +130,6 @@ document.getElementById("set-player").addEventListener("click", function (event)
     document.getElementById("username-input").value = "";
 
 });
-
-
 
 document.getElementById("send-message").addEventListener("click", function (event) {
     event.preventDefault();
@@ -147,8 +148,6 @@ document.getElementById("send-message").addEventListener("click", function (even
     document.getElementById("chat-message").value = "";
 });
 
-
-
 database.ref("/messenger").on("child_added", function (snapshot) {
     var newMessage = document.createElement('div');
     var messageBody = document.getElementById("sent-messages");
@@ -158,23 +157,23 @@ database.ref("/messenger").on("child_added", function (snapshot) {
     messageBody.appendChild(newMessage);
 });
 
-
-
 database.ref().on("value", function (snapshot) {
 
     // Player One DB values
     playerOne = snapshot.val().player1;
     searchPlayerOne = playerOne.userName;
-    playerOneAction = playerOne.action;
+    playerOneRoundWins = playerOne.roundWins;
+    playerOneRoundLosses = playerOne.roundLosses;
 
     // Player Two DB values
     playerTwo = snapshot.val().player2;
     searchPlayerTwo = playerTwo.userName;
-    playerTwoAction = playerTwo.action;
+    playerTwoRoundWins = playerTwo.roundWins;
+    playerTwoRoundLosses = playerTwo.roundLosses;
 
     // Current Game Variables
-    playerOneChoice = snapshot.val().player1.action;
-    playerTwoChoice = snapshot.val().player2.action;
+    playerOneChoice = playerOne.action;
+    playerTwoChoice = playerTwo.action;
     gameOngoing = snapshot.val().game.currentGame;
 
     // Sets Player One Card
@@ -191,7 +190,7 @@ database.ref().on("value", function (snapshot) {
     } else {
         document.getElementById("p2-username-display").innerHTML = "Waiting for opponent ...";
         document.getElementById("p2-record-display").style.display = "none";
-    }
+    };
 
     // Checks DB for existing user
     if (snapshot.child("username").exists()) {
@@ -202,24 +201,48 @@ database.ref().on("value", function (snapshot) {
 
     // If there is a current game in progress, new user can only view.
     if (gameOngoing) {
-        playerSelectionSection.style.display = "none";
-        currentPlayerSection.style.display = "block";
+        sectionDisplay(playerSelectionSection, "none");
+        sectionDisplay(currentPlayerSection, "block");
     } else {
-        playerSelectionSection.style.display = "block";
-    }
+        sectionDisplay(playerSelectionSection, "block");
+        sectionDisplay(currentPlayerSection, "none");
+    };
+
+    console.log("player one wins: ", playerOneRoundWins);
 
     // First, if the number of total rounds is met, players are notified and game resets in 10 seconds
-    if (roundCount === 2) {
-        var p1Wins = snapshot.val().player1.roundWins;
-        var p2Wins = snapshot.val().player2.roundWins;
-        console.log(p1Wins)
-        console.log(p2Wins);
-        if (p1Wins > p2Wins) {
-            warningMessage(searchPlayerOne + " wins", "alert alert-info")
-        } else if (p2Wins < p1Wins) {
-            warningMessage(searchPlayerTwo + " wins", "alert alert-info")
+    if (roundCount === 3) {
+        if (playerOneRoundWins > playerTwoRoundWins) {
+            playerOneWins = playerOneWins++;
+            playerTwoLosses = playerTwoLosses++;
+            database.ref("/player1").update({
+                winRecord: playerOneWins,
+                roundWins: 0
+            });
+            database.ref("/player2").update({
+                lossRecord: playerTwoLosses,
+                roundLosses: 0
+            });
+            warningMessage(searchPlayerOne + " wins", "alert alert-info");
+            sectionDisplay(messagePlaceholder, "block");
+            updateUserRecord(uid);
+        } else if (playerTwoRoundWins > playerOneRoundWins) {
+            playerTwoWins = playerTwoWins++;
+            playerOneLosses = playerOneLosses++;
+            database.ref("/player1").update({
+                lossRecord: playerOneLosses,
+                roundLosses: 0
+            });
+            database.ref("/player2").update({
+                winRecord: playerTwoWins,
+                roundWins: 0
+            });
+            warningMessage(searchPlayerTwo + " wins", "alert alert-info");
+            sectionDisplay(messagePlaceholder, "block");
+            updateUserRecord(uid);
         };
-        setTimeout(resetGame, 10000);
+        resetRound();
+        setTimeout(resetGame, 3000);
         // Otherwise, game continues    
     } else {
         // First, checks to make sure that player one and two have made a selection.
@@ -228,15 +251,17 @@ database.ref().on("value", function (snapshot) {
             if ((playerOneChoice === "rock" && playerTwoChoice === "scissors") ||
                 (playerOneChoice === "scissors" && playerTwoChoice === "paper") ||
                 (playerOneChoice === "paper" && playerTwoChoice === "rock")) {
-                playerOneMessage("Winner!", "alert alert-success", playerOneWins);
-                playerTwoMessage("Loser.", "alert alert-danger", playerTwoLosses);
+                playerOneMessage("Winner!", "alert alert-success");
+                playerTwoMessage("Loser.", "alert alert-danger");
                 roundCount++;
+                playerOneRoundWins++;
+                playerTwoRoundLosses++;
                 database.ref("/player1").update({
-                    roundWins: playerOneWins,
+                    roundWins: playerOneRoundWins,
                     action: ""
                 });
                 database.ref("/player2").update({
-                    roundLosses: playerTwoLosses,
+                    roundLosses: playerTwoRoundLosses,
                     action: ""
                 });
                 database.ref("/game").update({
@@ -249,15 +274,17 @@ database.ref().on("value", function (snapshot) {
                 setTimeout(nextRound, 3000);
                 // Checks for player two win
             } else {
-                playerOneMessage("Loser.", "alert alert-danger", playerOneLosses);
-                playerTwoMessage("Winner!", "alert alert-success", playerTwoWins);
+                playerOneMessage("Loser.", "alert alert-danger");
+                playerTwoMessage("Winner!", "alert alert-success");
                 roundCount++;
+                playerTwoRoundWins++;
+                playerOneRoundLosses++;
                 database.ref("/player1").update({
-                    roundLosses: playerOneLosses,
+                    roundLosses: playerOneRoundLosses,
                     action: ""
                 });
                 database.ref("/player2").update({
-                    roundWins: playerTwoWins,
+                    roundWins: playerTwoRoundWins,
                     action: ""
                 });
                 database.ref("/game").update({
@@ -271,19 +298,19 @@ database.ref().on("value", function (snapshot) {
     // Gets player role from sessionStorage
     role = sessionStorage.getItem("role");
     if (role === "Player 1") {
-        playerTwoActions.style.display = "none";
-        playerOneActions.style.display = "block";
+        sectionDisplay(playerTwoActions, "none");
+        sectionDisplay(playerOneActions, "block");
     } else if (role === "Player 2") {
-        playerOneActions.style.display = "none";
-        playerTwoActions.style.display = "block";
+        sectionDisplay(playerOneActions, "none");
+        sectionDisplay(playerTwoActions, "block");
     } else {
-        playerOneActions.style.display = "none";
-        playerTwoActions.style.display = "none";
-    }
+        sectionDisplay(playerOneActions, "none")
+        sectionDisplay(playerTwoActions, "none");
+    };
+
+    console.log("player one wins: (POST)", playerOneRoundWins);
 
 });
-
-
 
 function warningMessage(str, classes) {
     messagePlaceholder.innerHTML = str;
@@ -292,25 +319,19 @@ function warningMessage(str, classes) {
     messagePlaceholder.style.display = "block";
 };
 
-function playerOneMessage(str, classes, variable) {
+function playerOneMessage(str, classes) {
     playerOneMessagePlaceHolder.innerHTML = str;
     playerOneMessagePlaceHolder.setAttribute("class", classes);
     playerOneMessagePlaceHolder.classList.add("animated", "bounceIn", "faster")
     playerOneMessagePlaceHolder.style.display = "block";
-    return variable++;
-}
+};
 
-function playerTwoMessage(str, classes, variable) {
+function playerTwoMessage(str, classes) {
     playerTwoMessagePlaceHolder.innerHTML = str;
     playerTwoMessagePlaceHolder.setAttribute("class", classes);
     playerTwoMessagePlaceHolder.classList.add("animated", "bounceIn", "faster")
     playerTwoMessagePlaceHolder.style.display = "block";
-    return variable++
-}
-
-function playerOneChoice() {
-
-}
+};
 
 function setPlayerOneStats(element) {
     var choice = element.getAttribute("data-value");
@@ -355,17 +376,34 @@ function nextRound() {
     database.ref("/player2").update({
         action: ""
     });
-    
-    messagePlaceholder.style.display = "none";
-    playerOneMessagePlaceHolder.style.display = "none";
-    playerTwoMessagePlaceHolder.style.display = "none";
+
+    sectionDisplay(messagePlaceholder, "none");
+    sectionDisplay(playerOneMessagePlaceHolder, "none");
+    sectionDisplay(playerTwoMessagePlaceHolder, "none");
     clearTimeout();
 };
 
+function resetRound() {
+    roundCount = 0;
+    database.ref("/game").set({
+        currentGame: false,
+        round: roundCount
+    });
+};
 
+function updateUserRecord(str, str2) {
+    database.ref("/users").child(str).set({
+        winRecord: winRecord,
+        userName: userName,
+        lossRecord: lossRecord,
+        action: playerAction,
+        roundWins: roundWins,
+        roundLosses: roundLosses
+    });
+};
 
 function resetGame() {
-    roundCount = 0;
+    sessionStorage.removeItem("role");
     database.ref("/player1").set({
         userName: ""
     });
@@ -373,20 +411,18 @@ function resetGame() {
         userName: ""
     });
 
-    database.ref("/game").set({
-        currentGame: false,
-        round: roundCount
-    });
-
-    playerSelectionSection.style.display = "block";
-    currentPlayerSection.style.display = "none";
-    messagePlaceholder.style.display = "none";
+    sectionDisplay(playerSelectionSection, "block");
+    sectionDisplay(currentPlayerSection, "none");
+    sectionDisplay(messagePlaceholder, "none");
     playerOneMessagePlaceHolder.classList.remove();
     playerTwoMessagePlaceHolder.classList.remove();
     messagePlaceholder.classList.remove();
-    clearTimeout();
-}
+};
 
+function sectionDisplay(variable, str) {
+    var section = variable;
+    section.style.display = str;
+};
 
 
 
@@ -394,16 +430,12 @@ function resetGame() {
 document.getElementById("reset-game").addEventListener("click", function (event) {
     event.preventDefault();
 
+    resetRound();
     database.ref("/player1").set({
         userName: ""
     });
     database.ref("/player2").set({
         userName: ""
-    });
-
-    database.ref("/game").set({
-        currentGame: false,
-        round: 0
     });
 
     database.ref("/messenger").remove();
