@@ -164,16 +164,16 @@ database.ref().on("value", function (snapshot) {
     searchPlayerOne = playerOne.userName;
     playerOneRoundWins = playerOne.roundWins;
     playerOneRoundLosses = playerOne.roundLosses;
+    playerOneChoice = playerOne.action;
 
     // Player Two DB values
     playerTwo = snapshot.val().player2;
     searchPlayerTwo = playerTwo.userName;
     playerTwoRoundWins = playerTwo.roundWins;
     playerTwoRoundLosses = playerTwo.roundLosses;
+    playerTwoChoice = playerTwo.action;
 
     // Current Game Variables
-    playerOneChoice = playerOne.action;
-    playerTwoChoice = playerTwo.action;
     gameOngoing = snapshot.val().game.currentGame;
 
     // Sets Player One Card
@@ -207,8 +207,6 @@ database.ref().on("value", function (snapshot) {
         sectionDisplay(playerSelectionSection, "block");
         sectionDisplay(currentPlayerSection, "none");
     };
-
-    console.log("player one wins: ", playerOneRoundWins);
 
     // First, if the number of total rounds is met, players are notified and game resets in 10 seconds
     if (roundCount === 3) {
@@ -307,10 +305,16 @@ database.ref().on("value", function (snapshot) {
         sectionDisplay(playerOneActions, "none")
         sectionDisplay(playerTwoActions, "none");
     };
+});
 
-    console.log("player one wins: (POST)", playerOneRoundWins);
+database.ref("/player1").on("value", function (snapshot) {
+    
+});
+
+database.ref("/player2").on("value", function (snapshot) {
 
 });
+
 
 function warningMessage(str, classes) {
     messagePlaceholder.innerHTML = str;
@@ -391,7 +395,7 @@ function resetRound() {
     });
 };
 
-function updateUserRecord(str, str2) {
+function updateUserRecord(str) {
     database.ref("/users").child(str).set({
         winRecord: winRecord,
         userName: userName,
