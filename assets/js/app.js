@@ -42,6 +42,11 @@ var playerTwoWins = 0;
 var playerTwoLosses = 0;
 var role;
 
+
+// Ideas for elements.
+// 1. Dynamic content
+// 2. Objects to show.
+
 // Page Elements
 var playerSelectionSection = document.getElementById("player-selection");
 var currentPlayerSection = document.getElementById("current-players");
@@ -204,13 +209,15 @@ database.ref().on("value", function (snapshot) {
     }
 
     // First, if the number of total rounds is met, players are notified and game resets in 10 seconds
-    if (roundCount === 5) {
+    if (roundCount === 2) {
         var p1Wins = snapshot.val().player1.roundWins;
         var p2Wins = snapshot.val().player2.roundWins;
+        console.log(p1Wins)
+        console.log(p2Wins);
         if (p1Wins > p2Wins) {
-            warningMessage(searchPlayerOne, "alert alert-info")
-        } else if (p2Wins > p1Wins) {
-            warningMessage(searchPlayerTwo, "alert alert-info")
+            warningMessage(searchPlayerOne + " wins", "alert alert-info")
+        } else if (p2Wins < p1Wins) {
+            warningMessage(searchPlayerTwo + " wins", "alert alert-info")
         };
         setTimeout(resetGame, 10000);
         // Otherwise, game continues    
@@ -348,15 +355,17 @@ function nextRound() {
     database.ref("/player2").update({
         action: ""
     });
+    
     messagePlaceholder.style.display = "none";
     playerOneMessagePlaceHolder.style.display = "none";
     playerTwoMessagePlaceHolder.style.display = "none";
-    playerOneChoicePlaceHolder.style.display = "none";
-    playerTwoChoicePlaceHolder.style.display = "none";
     clearTimeout();
 };
 
+
+
 function resetGame() {
+    roundCount = 0;
     database.ref("/player1").set({
         userName: ""
     });
@@ -366,7 +375,7 @@ function resetGame() {
 
     database.ref("/game").set({
         currentGame: false,
-        round: 0
+        round: roundCount
     });
 
     playerSelectionSection.style.display = "block";
