@@ -179,14 +179,14 @@ database.ref().on("value", function (snapshot) {
     // Sets Player One Card
     if (searchPlayerOne !== "") {
         document.getElementById("p1-username-display").innerHTML = playerOne.userName;
-        document.getElementById("p1-record-display").innerHTML = playerOne.winRecord + " - " + playerOne.lossRecord;
+        document.getElementById("p1-record-display").innerHTML = playerOne.roundWins + " - " + playerOne.roundLosses;
     };
 
     // Sets Player Two Card
     if (searchPlayerTwo !== "") {
         document.getElementById("p2-record-display").style.display = "block";
         document.getElementById("p2-username-display").innerHTML = playerTwo.userName;
-        document.getElementById("p2-record-display").innerHTML = playerTwo.winRecord + " - " + playerTwo.lossRecord;
+        document.getElementById("p2-record-display").innerHTML = playerTwo.roundWins + " - " + playerTwo.roundLosses;
     } else {
         document.getElementById("p2-username-display").innerHTML = "Waiting for opponent ...";
         document.getElementById("p2-record-display").style.display = "none";
