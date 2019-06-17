@@ -30,11 +30,11 @@ Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/
     * Show P2 choice ✔️  
 7. if/else statement ✔️️  
     * Win  
-        * Set Winner in DB  
-        * winCount++ in DB  
+     * Set Winner in DB  
+     * winCount++ in DB  
     * Loss  
-        * if not Winner  
-        * lossCount++ in DB  
+     * if not Winner  
+     * lossCount++ in DB  
     * roundCount++  
     * Show Winner from DB  
 8. After 5 rounds, calculate winner ✔️️  
