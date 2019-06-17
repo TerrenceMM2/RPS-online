@@ -4,10 +4,10 @@ Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/
   
 ## Instructions  
 1. Each player will enter their unique username.  
-  1. If username already exists in the database, a new user entry is not created. (Usernames are case-sensitive).  
-  2. Players are automatically assigned to Player 1 or Player 2 based on their order of submission.  
-  3. A user will be notified if their Username input has already been set by another player.  
-  4. All others will be listed as "viewers" and are able to watch the ongoing game.  
+    1. If username already exists in the database, a new user entry is not created. (Usernames are case-sensitive).  
+    2. Players are automatically assigned to Player 1 or Player 2 based on their order of submission.  
+    3. A user will be notified if their Username input has already been set by another player.  
+    4. All others will be listed as "viewers" and are able to watch the ongoing game.  
 2. The game will begin once Player 1 and Player 2 are set.  
 3. Both players will be shown their own rock (🌑), paper (📃), scissors (✂️) options and will make a selection.  
 4. Once both players have made their RPS choice, a winner and loser for that round is calculated and a message shown.  
