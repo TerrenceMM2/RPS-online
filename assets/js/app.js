@@ -209,7 +209,7 @@ database.ref().on("value", function (snapshot) {
     };
 
     // First, if the number of total rounds is met, players are notified and game resets in 10 seconds
-    if (roundCount === 3) {
+    if (roundCount === 5) {
         if (playerOneRoundWins > playerTwoRoundWins) {
             playerOneWins = playerOneWins++;
             playerTwoLosses = playerTwoLosses++;
@@ -240,7 +240,7 @@ database.ref().on("value", function (snapshot) {
             updateUserRecord(uid);
         };
         resetRound();
-        setTimeout(resetGame, 3000);
+        setTimeout(resetGame, 10000);
         // Otherwise, game continues    
     } else {
         // First, checks to make sure that player one and two have made a selection.
