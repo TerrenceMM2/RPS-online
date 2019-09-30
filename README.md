@@ -2,6 +2,9 @@
 Vanderbilt Coding Boot Camp - Coursework7 - Rock, Paper, Scissors Multiplayer Game  
 Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/   
   
+## Purpose
+This multiplayer Rock, Paper, Scissor game demonstrates the use of database storage using Firebase.
+  
 ## Instructions  
 1. Each player will enter their unique username.  
     1. If username already exists in the database, a new user entry is not created. (Usernames are case-sensitive).  
@@ -14,22 +17,15 @@ Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/
 5. After 5 rounds, an overall winner and loser is declared and the game resets.  
 * Chat functionality is available to all participants.  
 
-### Pseudocode  
-1. Initialize DB values ✔️  
-2. Player 1 enters unique username (<input>) ✔️  
-    * If userName in DB, notify end-user ✔️  
-    * Store name in DB ✔️  
-    * Set Player 1 in DB ✔️  
-    * Show name on page ✔️  
-3. Show Player 2 data (relative) ✔️  
-4. Show rock, paper, scissors option  ✔️
-5. Start time (5 seconds)  
-6. Users clicks options ✔️  
-    * Store in DB ✔️  
-    * Show P1 choice ✔️  
-    * Show P2 choice ✔️  
-7. if/else statement ✔️️  
-    * Win (Set Winner in DB & winCount++ in DB)  
-    * Loss (if not Winner, lossCount++ in DB, roundCount++)   
-    * Show Winner from DB  
-8. After 5 rounds, calculate winner ✔️️  
+## Screenshot
+![Rock, Paper, Scissor Game Screenshot](../media/rps-screenshot.png?raw=true)
+
+### Built With
+1. HTML/CSS
+2. JavaScript
+3. [jQuery](https://jquery.com/)
+4. [Bootstrap](https://getbootstrap.com/)
+5. [Firebase](https://firebase.google.com/)
+
+### Author
+* **Terrence Mahnken** - [LinkedIn](https://www.linkedin.com/in/terrencemahnken/) | [Twitter](https://twitter.com/TerrenceMahnken) | [Personal Portfolio](https://terrencemm2.github.io/)
