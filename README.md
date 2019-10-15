@@ -1,5 +1,5 @@
 # Online Rock, Paper, Scissors
-Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/   
+Live Link: https://terrencemm2.github.io/RPS-online/   
   
 ## Purpose
 This multiplayer Rock, Paper, Scissor game demonstrates the use of database storage using Firebase.
