@@ -1,5 +1,4 @@
-# coursework7-rps-multiplayer
-Vanderbilt Coding Boot Camp - Coursework7 - Rock, Paper, Scissors Multiplayer Game  
+# Online Rock, Paper, Scissors
 Live Link: https://terrencemm2.github.io/coursework7-rps-multiplayer/   
   
 ## Purpose
